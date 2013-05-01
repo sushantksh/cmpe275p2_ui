@@ -27,7 +27,7 @@ headers = {'content-type': 'application/json', 'charset': 'utf-8'}
 
 def add_user(request):
    global url, headers, user
-   payload = '{"_id": "userid1","courseId": "courseId","questions": [{"question": "Que1","options": ["option1","option2"],"answer": "option1","point": 1},{"question": "Que2","options": ["option1","option2"],"answer":"option1","point": 1}]}'
+   payload = {"_id": "userid1","courseId": "courseId","questions": [{"question": "Que1","options": ["option1","option2"],"answer": "option1","point": 1},{"question": "Que2","options": ["option1","option2"],"answer":"option1","point": 1}]}
    response = requests.post(url + user, data=json.dumps(payload), headers=headers)
    print response.text
 # print response.status_code
@@ -49,7 +49,7 @@ def remove_user():
 
 def update_user():
    global url, headers, user
-   payload = '{"_id": "disid1",“courseId”: “courseId”,"title": "Title","description": "desc","messages": [{"messages": "msg1234","user": "user1","postDate": "DATE"},{"messages": "msg2","user": "user2","postDate": "DATE"}]}'
+   payload = {"_id": "disid1","courseId": "courseId","title": "Title","description": "desc","messages": [{"messages": "msg1234","user": "user1","postDate": "DATE"},{"messages": "msg2","user": "user2","postDate": "DATE"}]}
    response = requests.put(url + course, data=json.dumps(payload), headers=headers)
    print response.text
 
@@ -60,7 +60,7 @@ def update_user():
 
 def add_course(request):
    global url, headers, course
-   payload = '{"_id":"course1","category":"annonymous_1","title":"introduction to algebra","section":2,"dept":"eng","term":"Spring","year":2013,"instructor":[{"name":"russel Doe","id":29}],"days":["Monday","Wednesday","Friday"],"hours":["8:00AM","9:15:AM"],"Description":"My course","attachment":"PATH","version":"1"}'
+   payload = {"_id":"course1","category":"annonymous_1","title":"introduction to algebra","section":2,"dept":"eng","term":"Spring","year":2013,"instructor":[{"name":"russel Doe","id":29}],"days":["Monday","Wednesday","Friday"],"hours":["8:00AM","9:15:AM"],"Description":"My course","attachment":"PATH","version":"1"}
    response = requests.post(url + course, data=json.dumps(payload), headers=headers)
    print response.text
    
@@ -81,7 +81,7 @@ def remove_course():
 
 def update_course():
    global url, headers, course
-   payload = '{"_id":"course1","category":"annonymous_1","title":"machine learning","section":2,"dept":"eng","term":"Spring","year":2013,"instructor":[{"name":"russel Doe","id":29}],"days":["Monday","Wednesday","Friday"],"hours":["8:00AM","9:15:AM"],"Description":"My course","attachment":"PATH","version":"1"}'
+   payload = {"_id":"course1","category":"annonymous_1","title":"machine learning","section":2,"dept":"eng","term":"Spring","year":2013,"instructor":[{"name":"russel Doe","id":29}],"days":["Monday","Wednesday","Friday"],"hours":["8:00AM","9:15:AM"],"Description":"My course","attachment":"PATH","version":"1"}
    response = requests.put(url + course, data=json.dumps(payload), headers=headers)
    print response.text
 #
@@ -90,7 +90,7 @@ def update_course():
 
 def add_category():
    global url, headers, category
-   payload = '{"_id":"annonymous_1", "name":"Cooking"}'
+   payload = {"_id":"annonymous_1", "name":"Cooking"}
    response = requests.post(url + category, data=json.dumps(payload), headers=headers)
    print response.text
    
@@ -111,7 +111,7 @@ def remove_category():
 
 def update_category():
    global url, headers, category
-   payload = '{"_id":"annonymous_1", "name":"Home Cooking"}'
+   payload = {"_id":"annonymous_1", "name":"Home Cooking"}
    response = requests.put(url + course, data=json.dumps(payload), headers=headers)
    print response.text
 
@@ -122,7 +122,7 @@ def update_category():
 
 def add_announcement():
    global url, headers, announcement
-   payload = '{"_id": "anid1","courseId": "courseId","title": "Title","description":"desc","postDate": "04-22-2013","status": 0}'
+   payload = {"_id": "anid1","courseId": "courseId","title": "Title","description":"desc","postDate": "04-22-2013","status": 0}
    response = requests.post(url + announcement, data=json.dumps(payload), headers=headers)
    print response.text
    
@@ -143,7 +143,7 @@ def remove_announcement():
 
 def update_announcement():
    global url, headers, announcement
-   payload = '{"_id": "anid1","courseId": "courseId","title": "Title1234","description":"desc","postDate": "04-22-2013","status": 0}'
+   payload = {"_id": "anid1","courseId": "courseId","title": "Title1234","description":"desc","postDate": "04-22-2013","status": 0}
    response = requests.put(url + course, data=json.dumps(payload), headers=headers)
    print response.text
 
@@ -154,7 +154,7 @@ def update_announcement():
 
 def add_discussion():
    global url, headers, discussion
-   payload = '{"_id": "disid1","courseId": "course1","title": "Title","description": "desc","messages": [{"messages": "msg1","user": "user1","postDate": "04-22-2013"}, {"messages": "msg2","user": "user2","postDate":"01-22-2013"}]}'
+   payload = {"_id": "disid1","courseId": "course1","title": "Title","description": "desc","messages": [{"messages": "msg1","user": "user1","postDate": "04-22-2013"}, {"messages": "msg2","user": "user2","postDate":"01-22-2013"}]}
    response = requests.post(url + discussion, data=json.dumps(payload), headers=headers)
    print response.text
    
@@ -175,7 +175,7 @@ def remove_discussion():
 
 def update_discussion():
    global url, headers, discussion
-   payload = '{"_id": "disid1",“courseId”: “courseId”,"title": "Title","description": "desc","messages": [{"messages": "msg1234","user": "user1","postDate": "DATE"},{"messages": "msg2","user": "user2","postDate": "DATE"}]}'
+   payload = {"_id": "disid1","courseId": "courseId","title": "Title","description": "desc","messages": [{"messages": "msg1234","user": "user1","postDate": "DATE"},{"messages": "msg2","user": "user2","postDate": "DATE"}]}
    response = requests.put(url + course, data=json.dumps(payload), headers=headers)
    print response.text
 
@@ -185,7 +185,7 @@ def update_discussion():
 
 def add_quiz():
    global url, headers, quiz
-   payload = '{"_id": "quizid1","courseId": "courseId","questions": [{"question": "Que1","options": ["option1","option2"],"answer": "option1","point": 1},{"question": "Que2","options": ["option1","option2"],"answer":"option1","point": 1}]}'
+   payload = {"_id": "quizid1","courseId": "courseId","questions": [{"question": "Que1","options": ["option1","option2"],"answer": "option1","point": 1},{"question": "Que2","options": ["option1","option2"],"answer":"option1","point": 1}]}
    response = requests.post(url + quiz, data=json.dumps(payload), headers=headers)
    print response.text
    
@@ -206,7 +206,7 @@ def remove_quiz():
 
 def update_quiz():
    global url, headers, quiz
-   payload = '{"_id": "disid1",“courseId”: “courseId”,"title": "Title","description": "desc","messages": [{"messages": "msg1234","user": "user1","postDate": "DATE"},{"messages": "msg2","user": "user2","postDate": "DATE"}]}'
+   payload = {"_id": "disid1","courseId": "courseId","title": "Title","description": "desc","messages": [{"messages": "msg1234","user": "user1","postDate": "DATE"},{"messages": "msg2","user": "user2","postDate": "DATE"}]}
    response = requests.put(url + course, data=json.dumps(payload), headers=headers)
    print response.text
 
