@@ -43,7 +43,7 @@ urlpatterns = patterns(
 
       url(r'^add_user/$', mooc.views.add_user),
       url(r'^get_user/$', mooc.views.get_user),
-      url(r'^list_user/$', mooc.views.list_user),
+#       url(r'^list_user/$', mooc.views.list_user),
       url(r'^update_user/$', mooc.views.update_user),
       url(r'^remove_user/$', mooc.views.remove_user),
 # Uncomment the admin/doc line below to enable admin documentation:

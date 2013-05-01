@@ -6,7 +6,6 @@ from django.http import HttpResponse
 from django.template import RequestContext
 import json
 import requests
-from requests import session
 
 url = "http://localhost:8080/" 
 
@@ -27,14 +26,19 @@ headers = {'content-type': 'application/json', 'charset': 'utf-8'}
 
 def add_user(request):
    global url, headers, user
-   payload = {"_id": "userid1","courseId": "courseId","questions": [{"question": "Que1","options": ["option1","option2"],"answer": "option1","point": 1},{"question": "Que2","options": ["option1","option2"],"answer":"option1","point": 1}]}
+   email = request.POST.get('email')
+   password = request.POST.get('password')
+   firstname = request.POST.get('firstname')
+   lastname = request.POST.get('lastname')
+
+   payload = {"email": email,"pwd": password,"fName": firstname,"lName":lastname}
    response = requests.post(url + user, data=json.dumps(payload), headers=headers)
    print response.text
 # print response.status_code
    
 def get_user(request):
    global url, headers, user
-   response = requests.get(url + user +"/disid1")
+   response = requests.get(url + user +"/sugandhi@abc.com")
    print response.json()
    
 def list_user():
@@ -44,7 +48,7 @@ def list_user():
 
 def remove_user():
    global url, headers, user
-   response = requests.get(url + user +"/disid1")
+   response = requests.delete(url + user +"/sugandhi@abc.com")
    print response.text
 
 def update_user():
