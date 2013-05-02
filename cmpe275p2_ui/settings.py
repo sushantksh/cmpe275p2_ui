@@ -1,4 +1,5 @@
 # Django settings for cmpe275p2_ui project.
+import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -72,7 +73,8 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    "/Users/mdhoble/SJSU/CMPE-275/Projects/cmpe275p2_ui/mooc/assets",
+    os.path.join(os.path.dirname(__file__), '/mooc/assets').replace('\\','/'),
+#    "/Users/mdhoble/SJSU/CMPE-275/Projects/cmpe275p2_ui/mooc/assets",
 )
 
 # List of finder classes that know how to find static files in
@@ -113,7 +115,8 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    "/Users/mdhoble/SJSU/CMPE-275/Projects/cmpe275p2_ui/mooc/html"    
+    os.path.join(os.path.dirname(__file__), '/mooc/html').replace('\\','/'),
+#    "/Users/mdhoble/SJSU/CMPE-275/Projects/cmpe275p2_ui/mooc/html"    
 )
 
 INSTALLED_APPS = (
