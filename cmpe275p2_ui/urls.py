@@ -7,9 +7,10 @@ import mooc.views
 # from django.contrib import admin
 # admin.autodiscover()
 
-urlpatterns = patterns(
-      url(r'^login/$', mooc.views.login),
+urlpatterns = patterns('',
+ 	  url(r'^$', mooc.views.signin),
       url(r'^signup/$', mooc.views.signup),
+      url(r'^login$', mooc.views.login),
       url(r'^signup_home/$', mooc.views.signup_home),
       url(r'^add_course/$', mooc.views.add_course),
       url(r'^get_course/$', mooc.views.get_course),
@@ -41,11 +42,14 @@ urlpatterns = patterns(
       url(r'^update_quiz/$', mooc.views.update_quiz),
       url(r'^remove_quiz/$', mooc.views.remove_quiz),
 
-      url(r'^add_user/$', mooc.views.add_user),
+      url(r'^add_user$', mooc.views.add_user),
       url(r'^get_user/$', mooc.views.get_user),
 #       url(r'^list_user/$', mooc.views.list_user),
       url(r'^update_user/$', mooc.views.update_user),
       url(r'^remove_user/$', mooc.views.remove_user),
+      url(r'^assets/$', mooc.views.remove_user),      
+      
+      
 # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 

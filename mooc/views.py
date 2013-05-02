@@ -1,9 +1,12 @@
 # Create your views here.
-# Create your views here.
-from django.shortcuts import render_to_response, render
+
 # from django.contrib.auth import authenticate, login
+
+from django.shortcuts import render_to_response, render
 from django.http import HttpResponse
 from django.template import RequestContext
+from django.core.context_processors import csrf
+
 import json
 import requests
 
@@ -19,22 +22,26 @@ quiz = "quiz"
 lst = "/list"
 
 headers = {'content-type': 'application/json', 'charset': 'utf-8'}
-
+	
 #
 # user
 #
 
 def add_user(request):
    global url, headers, user
-   email = request.POST.get('email')
-   password = request.POST.get('password')
-   firstname = request.POST.get('firstname')
-   lastname = request.POST.get('lastname')
-
-   payload = {"email": email,"pwd": password,"fName": firstname,"lName":lastname}
-   response = requests.post(url + user, data=json.dumps(payload), headers=headers)
-   print response.text
-# print response.status_code
+   if request.method == "POST" :
+      email = request.POST.get("email", "")
+      password = request.POST.get('password')
+      firstname = request.POST.get('firstname')
+      lastname = request.POST.get('lastname')
+         
+      payload = {"_id": email,"pwd": password,"fName": firstname,"lName":lastname}
+      print '---> payload:',payload
+      response = requests.post(url + user, data=json.dumps(payload), headers=headers)
+   
+   c = {}
+   c.update(csrf(request))
+   return render_to_response("login.html", c)
    
 def get_user(request):
    global url, headers, user
@@ -214,32 +221,35 @@ def update_quiz():
    response = requests.put(url + course, data=json.dumps(payload), headers=headers)
    print response.text
 
+def signin(request):
+   c = {}
+   c.update(csrf(request))
+   return render_to_response("login.html", c)
 
 def login(request):
-   if request.POST:
-      username = request.POST.get('username')
-      password = request.POST.get('password')
-      
-   payload = {'email':username,'pwd':password}
-   #with session() as c:
-      #c.post('http://127.0.0.1:8000/login/', data=payload)
-      #request = c.get('http://127.0.0.1:8000/login/')
-      #print request.headers
-      #print request.text
-   
-   print "Calling bottle from Django ...... from sign in HOME "
-   r = requests.post("http://localhost:8080/login",data=json.dumps(payload))
-   print str(r)+" ---- > Call Back from Bottle Achieved "
-   ctx = r.json()
-   #name = request.session['username']
-   #print name
-   print ctx
-   
-   return render_to_response("home.html",ctx,context_instance=RequestContext(request))
+   global url, user
+   if request.method == "POST" :
+      email = request.POST.get("email")
+      password = request.POST.get("password")
+         
+      response = requests.get(url + user + "/" + email)
+      data = json.loads(response.text) 
+      pwd = data["pwd"]
 
+      if password == pwd:
+         ctx = {"fName": data["fName"], "lName": data["lName"]}
+         return render_to_response("home.html",ctx,context_instance=RequestContext(request))
+   
+   c = {}
+   c.update(csrf(request))
+   return render_to_response("login.html", c)
+      
 # Sign Up function
 def signup(request):
-   return render(request, 'signUp.html')
+   c = {}
+   c.update(csrf(request))
+   return render_to_response("signUp.html", c)
+
 
 # signup_home page fucntion is called when there is new user entry
 def signup_home(request):

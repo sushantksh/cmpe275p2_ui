@@ -65,13 +65,14 @@ STATIC_ROOT = ''
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
-STATIC_URL = '/static/'
+STATIC_URL = '/assets/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    "/Users/mdhoble/SJSU/CMPE-275/Projects/cmpe275p2_ui/mooc/assets",
 )
 
 # List of finder classes that know how to find static files in
@@ -79,7 +80,8 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+  #  'django.contrib.staticfiles.finders.DefaultStorageFinder',
+
 )
 
 # Make this unique, and don't share it with anybody.
@@ -99,7 +101,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
-    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
 ROOT_URLCONF = 'cmpe275p2_ui.urls'
@@ -111,6 +113,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    "/Users/mdhoble/SJSU/CMPE-275/Projects/cmpe275p2_ui/mooc/html"    
 )
 
 INSTALLED_APPS = (
@@ -154,3 +157,6 @@ LOGGING = {
         },
     }
 }
+
+# Append Slash to request
+APPEND_SLASH = False
