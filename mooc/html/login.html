@@ -54,14 +54,14 @@
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/assets/ico/apple-touch-icon-114-precomposed.png">
       <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/assets/ico/apple-touch-icon-72-precomposed.png">
                     <link rel="apple-touch-icon-precomposed" href="/assets/ico/apple-touch-icon-57-precomposed.png">
-                                   <link rel="shortcut icon" href="/assets/ico/favicon.png">
+                                   <!-- <link rel="shortcut icon" href="../assets/ico/favicon.png"> -->
   </head>
 
   <body>
 
     <div class="container">
 
-	  <form name="LoginForm" class="form-signin" action="/login" method="post">{% csrf_token %}
+	  <form name="LoginForm" class="form-signin" action="/login" method="POST">{% csrf_token %}
         <h2 class="form-signin-heading">Please sign in</h2>
         <input type="text" class="input-block-level" placeholder="Email address" name="email">
         <input type="password" class="input-block-level" placeholder="Password" name="password">
@@ -70,7 +70,7 @@
       
         <br>
         <br>
-        <h4>Not Registered Yet...</h4>
+        <h4>Not Registered Yet ?</h4>
         <a href="/signup"><button class="btn btn-large btn-primary" type="button">Register</button></a>
 	  </form>
     </div> <!-- /container -->

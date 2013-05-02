@@ -4,23 +4,9 @@ import os
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-ADMINS = (
-     ('Manoj Dhoble', 'mdhoble@gmail.com'),
-)
+ADMINS = (('Manoj Dhoble', 'mdhoble@gmail.com'),)
 
 MANAGERS = ADMINS
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '/Users/mdhoble/SJSU/CMPE-275/Projects/cmpe275p2_ui',                      # Or path to database file if using sqlite3.
-        # The following settings are not used with sqlite3:
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '',                      # Set to empty string for default.
-    }
-}
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
@@ -73,7 +59,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(os.path.dirname(__file__), '/mooc/assets').replace('\\','/'),
+    os.path.join(os.path.dirname(__file__), 'mooc/assets').replace('\\','/').replace('cmpe275p2_ui/cmpe275p2_ui',"cmpe275p2_ui"),
 #    "/Users/mdhoble/SJSU/CMPE-275/Projects/cmpe275p2_ui/mooc/assets",
 )
 
@@ -111,11 +97,12 @@ ROOT_URLCONF = 'cmpe275p2_ui.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'cmpe275p2_ui.wsgi.application'
 
+print os.path.join(os.path.dirname(__file__), 'mooc/html').replace('\\','/').replace('cmpe275p2_ui/cmpe275p2_ui',"cmpe275p2_ui")
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(os.path.dirname(__file__), '/mooc/html').replace('\\','/'),
+    os.path.join(os.path.dirname(__file__), 'mooc/html').replace('\\','/').replace('cmpe275p2_ui/cmpe275p2_ui',"cmpe275p2_ui"),
 #    "/Users/mdhoble/SJSU/CMPE-275/Projects/cmpe275p2_ui/mooc/html"    
 )
 

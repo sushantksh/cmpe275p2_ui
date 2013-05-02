@@ -22,47 +22,48 @@ quiz = "quiz"
 lst = "/list"
 
 headers = {'content-type': 'application/json', 'charset': 'utf-8'}
-	
+
+def home(request):
+   return render_to_response('home.html')
 #
 # user
 #
 
 def add_user(request):
    global url, headers, user
+   c = {}
    if request.method == "POST" :
-      email = request.POST.get("email", "")
+      email = request.POST.get("email")
       password = request.POST.get('password')
       firstname = request.POST.get('firstname')
       lastname = request.POST.get('lastname')
          
-      payload = {"_id": email,"pwd": password,"fName": firstname,"lName":lastname}
+      payload = {"_id": email,"pwd": password,"firstName": firstname,"lastName":lastname}
       print '---> payload:',payload
       response = requests.post(url + user, data=json.dumps(payload), headers=headers)
-   
-   c = {}
-   c.update(csrf(request))
-   return render_to_response("login.html", c)
+      if response.status_code == 200:
+         c.update(csrf(request))
+   return render_to_response("home.html", c)
    
 def get_user(request):
    global url, headers, user
    response = requests.get(url + user +"/sugandhi@abc.com")
    print response.json()
    
-def list_user():
+def list_user(request):
    global url, headers, user, lst
    response = requests.get(url + user + lst)
    print response.json()
 
-def remove_user():
+def remove_user(request):
    global url, headers, user
    response = requests.delete(url + user +"/sugandhi@abc.com")
    print response.text
 
-def update_user():
+def update_user(request):
    global url, headers, user
    payload = {"_id": "disid1","courseId": "courseId","title": "Title","description": "desc","messages": [{"messages": "msg1234","user": "user1","postDate": "DATE"},{"messages": "msg2","user": "user2","postDate": "DATE"}]}
-   response = requests.put(url + course, data=json.dumps(payload), headers=headers)
-   print response.text
+   print update_user_util(payload)
 
 
 #
@@ -82,7 +83,7 @@ def get_course(request):
    
 def list_course(request):
    global url, headers, course, lst
-   response = requests.get(url + course + lst)
+   requests.get(url + course + lst)
 #   print response.json()
    return render_to_response("courses.html") 
 
@@ -234,11 +235,14 @@ def login(request):
       password = request.POST.get("password")
          
       response = requests.get(url + user + "/" + email)
-      data = json.loads(response.text) 
+      data = response.json() 
+      print data
       pwd = data["pwd"]
 
       if password == pwd:
          ctx = {"fName": data["fName"], "lName": data["lName"]}
+         data['Status'] = 1
+         update_user_util(data)
          return render_to_response("home.html",ctx,context_instance=RequestContext(request))
    
    c = {}
@@ -267,15 +271,23 @@ def signup_home(request):
    print str(r)+" ---- > Call Back from Bottle Achieved "
    ctx = r.json()
    print ctx
-   #request.session['username'] = 'Sushant'
-   return render_to_response("home.html",ctx,context_instance=RequestContext(request))
+   return render_to_response("signin.html",ctx,context_instance=RequestContext(request))
    #return render(request, "home.html",{"email": email})
 
 # log out function
-# def logout(request):
-#    r = requests.get("http://localhost:8080/logout/:email",data=json.dumps(payload))
-#    print str(r)+" ---- > Call Back from Bottle Achieved "
-#    ctx = r.json()
-#    print ctx
-#    return render_to_response("login.html",ctx,context_instance=RequestContext(request))   
+def logout(request):
+   global url, user
+   r = requests.get("http://localhost:8080/user/sugandhi@abc.com")
+   ctx = r.json()
+   print ctx
+   ctx['Status'] = 0
+   update_user_util(ctx)
+   return render_to_response('login.html')   
 
+
+#
+# Utility Methods
+#
+def update_user_util(payload):
+   global url, user
+   return requests.put(url + user, data=json.dumps(payload), headers=headers)
