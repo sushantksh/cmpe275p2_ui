@@ -14,7 +14,7 @@ urlpatterns = patterns('',
       url(r'^signup_home/$', mooc.views.signup_home),
       url(r'^add_course/$', mooc.views.add_course),
       url(r'^get_course/$', mooc.views.get_course),
-      url(r'^list_course/$', mooc.views.list_course),
+      url(r'^list_course$', mooc.views.list_course),
       url(r'^update_course/$', mooc.views.update_course),
       url(r'^remove_course/$', mooc.views.remove_course),
 

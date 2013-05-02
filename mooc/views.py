@@ -80,10 +80,11 @@ def get_course(request):
    response = requests.get(url + course +"/course1")
    print response.json()
    
-def list_course():
+def list_course(request):
    global url, headers, course, lst
    response = requests.get(url + course + lst)
-   print response.json()
+#   print response.json()
+   return render_to_response("courses.html") 
 
 def remove_course():
    global url, headers, course
