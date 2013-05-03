@@ -101,33 +101,61 @@ def update_course():
 # Category
 #
 
-def add_category():
+def category(request):
+   c = {}
+   c.update(csrf(request))
+   return render_to_response("addCategory.html", c)
+
+def add_category(request):
    global url, headers, category
-   payload = {"_id":"annonymous_1", "name":"Cooking"}
-   response = requests.post(url + category, data=json.dumps(payload), headers=headers)
-   print response.text
+   global endpoint
+   if request.POST:
+      name = request.POST.get('catName')
+      payload = {"_id":name, "name":name, "description":"desc", "createDate":"01-01-2013", "status":0}
+      data=json.dumps(payload)
+      print '--->AddCategory:data=', data
+      response = requests.post("http://localhost:8080/category", data, headers=headers)
+      if response.status_code == 200:
+         print 'SUCCESS'
+   return list_category(request)
    
 def get_category(request):
    global url, headers, category
-   response = requests.get(url + category +"/annonymous_1")
-   print response.json()
+   global endpoint
    
-def list_category():
-   global url, headers, category, lst
-   response = requests.get(url + category + lst)
-   print response.json()
+   name = request.GET.get('id')
+   response = requests.get("http://localhost:8080/category/" + name)
+   print '--->Category:List', response.text
+   data = response.json()
+   print '--->Category:data=', data
+   ctx = {"category": data["name"]}
 
-def remove_category():
+   return render_to_response("viewCategory.html",ctx,context_instance=RequestContext(request))   
+   
+def list_category(request):
+   global url, category, lst
+   global endpoint
+   response = requests.get("http://localhost:8080/category/list")
+   print '--->Category:List', response.text
+   data = response.json()
+   print '--->Category:data=', data
+   ctx = {"fName": "Manoj", "lName": "Dhoble","category_list":data["list"]}
+
+   return render_to_response("categories.html",ctx,context_instance=RequestContext(request))
+
+def remove_category(request):
    global url, headers, category
-   response = requests.get(url + category +"/annonymous_1")
-   print response.text
+   
+   name = request.GET.get('id')
+   response = requests.delete("http://localhost:8080/category/" + name)
+   return list_category(request)
+   
 
-def update_category():
+def update_category(request):
    global url, headers, category
-   payload = {"_id":"annonymous_1", "name":"Home Cooking"}
-   response = requests.put(url + course, data=json.dumps(payload), headers=headers)
-   print response.text
-
+   c = {}
+   c.update(csrf(request))
+   return render_to_response("addCategory.html", c)
 
 #
 # announcement

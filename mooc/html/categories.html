@@ -27,7 +27,7 @@
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/assets/ico/apple-touch-icon-114-precomposed.png">
       <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/assets/ico/apple-touch-icon-72-precomposed.png">
                     <link rel="apple-touch-icon-precomposed" href="/assets/ico/apple-touch-icon-57-precomposed.png">
-                                   <!-- <link rel="shortcut icon" href="../assets/ico/favicon.png"> -->
+                                   <link rel="shortcut icon" href="/assets/ico/favicon.png">
   </head>
 
   <body>
@@ -43,9 +43,9 @@
           <a class="brand" href="#">CMPE 275 Project 2</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
-              <li class="active"><a href="#">Home</a></li>
-              <li><a href="/list_category">Categories</a></li>
-              <li><a href="/list_course">Courses</a></li>
+              <li><a href="#">Home</a></li>
+              <li class="active"><a href="#">Categories</a></li>
+              <li class="active"><a href="/list_course">Courses</a></li>
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Other MOOCS <b class="caret"></b></a>
                 <ul class="dropdown-menu">
@@ -56,7 +56,7 @@
                   <li><a href="#">Etc.</a></li>
                 </ul>
               </li>
-              <li style="width:250px;padding-left:150px;padding-top:8px"><font color="white"><b>Welcome {{ fName }} {{ lName }} !</b></font></li>
+              <li style="width:250px;padding-left:150px;"><font color="white"><b>Welcome {{ fName }} {{ lName }} !</b></font></li>
               <li><a href="update_user">Profile</a></li>
               <li><a href="logout">Logout</a></li>
             </ul>
@@ -68,11 +68,26 @@
     <div class="container">
 
       <!-- Main hero unit for a primary marketing message or call to action -->
-      <div class="hero-unit">
-        <h3>CMPE 275 Project 2 Goals:</h3>
-        <p>Collaborative MOOCs with competitive groups within a MOOC.</p>
-        <p>MOOC specification allows your web stack to connect and interact between/across Monday and Wednesday sections.</p>
-        <p><a href="#" class="btn btn-primary btn-large">Learn more &raquo;</a></p>
+      <div class="row">
+      	<a href="/category">Add Category</a>
+      	<br>
+      </div>
+      <div class=row>
+      <h1>Category List</h1>
+      <table class="table table-bordered">
+      <tr>
+      	<th>No.</th>
+      	<th>Category</th>
+      </tr>
+        {% for category in category_list %}
+        <tr>
+ 		<td>{{forloop.counter}}</td>
+		<td><a href="/get_category?id={{category.name}}">{{category.name}}</a></td>
+		<td><a href="/remove_category?id={{category.name}}">Remove</a></td>
+		<td><a href="/update_category?id={{category.name}}">Edit</a></td>
+		</tr>
+		{% endfor %}      
+	  </table>
       </div>
       <hr>
 

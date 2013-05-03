@@ -8,9 +8,10 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-  	 url(r'^$', mooc.views.home),
+  	 url(r'^$', mooc.views.signin),
     url(r'^home$', mooc.views.home),
     url(r'^signup$', mooc.views.signup),
+    url(r'^signup/$', mooc.views.signup),
     url(r'^login$', mooc.views.login),
     url(r'^logout', mooc.views.logout),
     
@@ -21,6 +22,7 @@ urlpatterns = patterns('',
     url(r'^update_course$', mooc.views.update_course),
     url(r'^remove_course$', mooc.views.remove_course),
 
+    url(r'^category$', mooc.views.category),
     url(r'^add_category$', mooc.views.add_category),
     url(r'^get_category$', mooc.views.get_category),
     url(r'^list_category$', mooc.views.list_category),
