@@ -153,9 +153,16 @@ def remove_category(request):
 
 def update_category(request):
    global url, headers, category
-   c = {}
-   c.update(csrf(request))
-   return render_to_response("addCategory.html", c)
+   id = request.GET.get('id')
+   
+   response = requests.get("http://localhost:8080/category/" + id)
+   print '--->Category:update=', response.text
+   data = response.json()
+   print '--->Category:data=', data
+   ctx = {"category": data["name"]}
+   ctx.update(csrf(request))
+
+   return render_to_response("addCategory.html",ctx,context_instance=RequestContext(request))
 
 #
 # announcement
