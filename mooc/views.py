@@ -38,7 +38,7 @@ def add_user(request):
       firstname = request.POST.get('firstname')
       lastname = request.POST.get('lastname')
          
-      payload = {"_id": email,"pwd": password,"firstName": firstname,"lastName":lastname}
+      payload = {"_id": email,"pwd": password,"fName": firstname,"lName":lastname}
       print '---> payload:',payload
       response = requests.post(url + user, data=json.dumps(payload), headers=headers)
       if response.status_code == 200:
@@ -300,7 +300,7 @@ def signup_home(request):
       firstname = request.POST.get('firstname')
       lastname = request.POST.get('lastname')
 
-   payload = { "email": username,"pwd": password,"fName": firstname,"lName": lastname} 
+   payload = { "email":username,"pwd":password,"fName":firstname,"lName":lastname} 
    print "Calling bottle from Django ......from SignUp Home "
    r = requests.post(endpoint + "signup",data=json.dumps(payload))
    print str(r)+" ---- > Call Back from Bottle Achieved "
