@@ -22,6 +22,9 @@ lst = "/list"
 
 headers = {'content-type': 'application/json', 'charset': 'utf-8'}
 
+def index(request):
+   return render_to_response('login.html')
+
 def home(request):
    return render_to_response('home.html')
 
