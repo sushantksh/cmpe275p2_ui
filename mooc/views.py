@@ -6,6 +6,7 @@ from django.core.context_processors import csrf
 from django.contrib.auth import authenticate, login, logout
 #from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from mooc.models import MOOC
 
 import json
 import requests
@@ -20,14 +21,22 @@ quiz = "quiz"
 
 lst = "/list"
 
+latest_mooc_list = None
+
 headers = {'content-type': 'application/json', 'charset': 'utf-8'}
 
 def index(request):
    return render_to_response('login.html')
 
 def home(request):
+   mooc_id = request.GET.get('id')
+   if mooc_id != None :
+      mooc = MOOC.objects.get(pk=mooc_id)
+      url = mooc.get_primary_url()
+   
+   ctx = {"fName": user.first_name, "lName": user.last_name, "latest_mooc_list": latest_poll_list }
    return render_to_response('home.html')
-
+url
 #
 # User login related stuff
 #
@@ -40,6 +49,8 @@ def signin(request):
    return render_to_response("login.html")
 
 def login_user(request):
+   latest_poll_list = MOOC.objects.all()
+    
    email = request.POST['email']
    password = request.POST['password']
    print password
@@ -47,7 +58,7 @@ def login_user(request):
    if user is not None:
       if user.is_active:
          login(request, user)
-         ctx = {"fName": user.first_name, "lName": user.last_name }
+         ctx = {"fName": user.first_name, "lName": user.last_name, "latest_mooc_list": latest_poll_list }
          return render_to_response("home.html",ctx,context_instance=RequestContext(request))
       else:
          # Return a 'disabled account' error message
