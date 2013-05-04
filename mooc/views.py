@@ -54,21 +54,6 @@ def login_user(request):
          ctx = {"message" :"Login Failed. Please try Again"}
          return render_to_response("login.html",ctx,context_instance=RequestContext(request))
       
-#       response = requests.get(url + user + "/" + email)
-#       data = response.json()
-#       if data is not None: 
-#          print data
-#          pwd = data["pwd"]
-# 
-#          if password == pwd:
-#             ctx = {"fName": data["fName"], "lName": data["lName"]}
-#             data['Status'] = 1
-#             update_user_util(data)
-#             return render_to_response("home.html",ctx,context_instance=RequestContext(request))
-#       else:         
-#          ctx = {"message": "Login Failed"}
-#          return render_to_response("login.html",ctx)
-
 def change_password(request):
    print "New Password",request.POST.get('password')
    print request.user.first_name
@@ -146,6 +131,15 @@ def update_user(request):
    payload = {"_id": "disid1","courseId": "courseId","title": "Title","description": "desc","messages": [{"messages": "msg1234","user": "user1","postDate": "DATE"},{"messages": "msg2","user": "user2","postDate": "DATE"}]}
    print update_user_util(payload)
 
+def enroll_user(request):
+   global headers, url, course
+   course_id = request.GET.get('id')
+   user_id = request.user.username
+   print course_id, user_id
+   payload = {"email" : user_id , "courseid" : course_id}
+   requests.put(url+ course + "/enroll", data=json.dumps(payload), headers=headers)
+   ctx = {"fName": request.user.first_name, "lName": request.user.last_name }
+   return render_to_response("home.html",ctx,context_instance=RequestContext(request))      
 
 #
 # Course

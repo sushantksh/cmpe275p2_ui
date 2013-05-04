@@ -15,7 +15,7 @@ urlpatterns = patterns('',
     url(r'^logout', mooc.views.logout_user),
     url(r'^profile', mooc.views.profile),
     url(r'^change_password', mooc.views.change_password),
-    
+    url(r'^enroll', mooc.views.enroll_user),
 
     url(r'^add_user$', mooc.views.add_user), # Handles User Sign Up Form.
     url(r'^get_user$', mooc.views.get_user),
