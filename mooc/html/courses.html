@@ -44,6 +44,7 @@
           <div class="nav-collapse collapse">
             <ul class="nav">
               <li><a href="#">Home</a></li>
+              <li class="active"><a href="/list_category">Categories</a></li>
               <li class="active"><a href="#">Courses</a></li>
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Other MOOCS <b class="caret"></b></a>
@@ -55,7 +56,7 @@
                   <li><a href="#">Etc.</a></li>
                 </ul>
               </li>
-              <li style="width:250px;padding-left:150px;"><font color="white"><b>Welcome {{ fName }} {{ lName }} !</b></font></li>
+              <li style="width:250px;padding-left:150px;padding-top:8px"><font color="white"><b>Welcome {{ fName }} {{ lName }} !</b></font></li>
               <li><a href="update_user">Profile</a></li>
               <li><a href="logout">Logout</a></li>
             </ul>
@@ -79,6 +80,7 @@
       	<th>Title</th>
       	<th>Start Date</th>
       	<th>End Date</th>
+      	<th>Enroll</th>
       </tr>
       <tr>
         <th>1</th>
@@ -86,6 +88,7 @@
       	<th><a href="/get_course/courseId">Excellent Recipe to boil eggs</a></th>
       	<th>Start Date</th>
       	<th>End Date</th>
+      	<th><a href="/enroll_course?id=1">Enroll</a></th>
       </tr>
 	  </table>
       </div>

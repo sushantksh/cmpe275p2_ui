@@ -60,7 +60,7 @@
   <body>
 
     <div class="container">
-	  <form name="CategoryForm" class="form-signin" action="/add_category" method="POST">{% csrf_token %}
+	  <form name="CategoryForm" class="form-signin" action="/add_category" method="POST">
         <h2 class="form-signin-heading">Add Category</h2>
 	    <label class="control-label" for="textarea">Name</label>  
         <input type="text" class="input-block-level" placeholder="Category Name" name="catName" value="{{category}}">

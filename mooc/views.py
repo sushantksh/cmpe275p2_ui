@@ -37,9 +37,9 @@ def signin(request):
    return render_to_response("login.html")
 
 def login_user(request):
-   global url, user
    email = request.POST['email']
    password = request.POST['password']
+   print password
    user = authenticate(username=email, password=password)
    if user is not None:
       if user.is_active:
@@ -70,10 +70,12 @@ def login_user(request):
 #          return render_to_response("login.html",ctx)
 
 def change_password(request):
-   user = User.objects.get(username__exact=request.POST.get('email'))
-   user.set_password(request.POST.get('new_password'))
-   user.save()
-      
+   print "New Password",request.POST.get('password')
+   print request.user.first_name
+   request.user.set_password(request.POST.get('password'))
+   request.user.save()
+   ctx = {"fName": request.user.first_name, "lName": request.user.last_name }
+   return render_to_response("home.html",ctx,context_instance=RequestContext(request))      
 
 # log out function
 def logout_user(request):
@@ -89,21 +91,25 @@ def logout_user(request):
 def add_user(request):
    global url, headers
    ctx = {}
+
    if request.method == "POST" :
       email = request.POST.get("email")
       password = request.POST.get('password')
       firstname = request.POST.get('firstname')
       lastname = request.POST.get('lastname')
 
-      local_user = User.objects.create_user(email, email, password)
-      local_user.first_name = firstname
-      local_user.last_name = lastname
-      local_user.save()
+      try: 
+         local_user = User.objects.create_user(email, email, password)
+         local_user.first_name = firstname
+         local_user.last_name = lastname
+         local_user.save()
+      except: 
+         ctx = {"message" : "User ID Exists. Please Try Again"}
+         return render_to_response("signup.html", ctx)
          
       payload = {"_id": email,"pwd": password,"fName": firstname,"lName":lastname}
       response = requests.post(url + "user", data=json.dumps(payload), headers=headers)
       if response.status_code == 200:
-         ctx.update(csrf(request))
          return render_to_response("login.html",ctx,context_instance=RequestContext(request))
       else :
          ctx = {"message" : "Sign Up Failed. Please Try Again"}
@@ -111,8 +117,8 @@ def add_user(request):
 
    
 def get_user(request):
-   global url, headers, user
-   response = requests.get(url + user +"/sugandhi@abc.com")
+   global url, headers
+   response = requests.get(url + "user/" + request.user.user_name)
    print response.json()
    
 def list_user(request):
@@ -125,8 +131,18 @@ def remove_user(request):
    response = requests.delete(url + user +"/sugandhi@abc.com")
    print response.text
 
+def profile(request):
+   data = {"fName" :request.user.first_name, "lName": request.user.last_name, "password" :request.user.password}
+   ctx = {"fName": request.user.first_name, "lName": request.user.last_name,"user_detail":data}
+
+   return render_to_response("profile.html",ctx,context_instance=RequestContext(request))
+
 def update_user(request):
-   global url, headers, user
+   data = {"fName" :request.user.first_name, "lName": request.user.last_name, "password" :request.user.password}
+   ctx = {"fName": request.user.first_name, "lName": request.user.last_name,"user_detail":data}
+
+   return render_to_response("profile.html",ctx,context_instance=RequestContext(request))
+
    payload = {"_id": "disid1","courseId": "courseId","title": "Title","description": "desc","messages": [{"messages": "msg1234","user": "user1","postDate": "DATE"},{"messages": "msg2","user": "user2","postDate": "DATE"}]}
    print update_user_util(payload)
 
@@ -167,9 +183,7 @@ def update_course():
 #
 
 def category(request):
-   c = {}
-   c.update(csrf(request))
-   return render_to_response("addCategory.html", c)
+   return render_to_response("addCategory.html")
 
 def add_category(request):
    global url, headers, category
@@ -204,8 +218,7 @@ def list_category(request):
    print '--->Category:List', response.text
    data = response.json()
    print '--->Category:data=', data
-   ctx = {"fName": "Manoj", "lName": "Dhoble","category_list":data["list"]}
-
+   ctx = {"fName": request.user.first_name, "lName": request.user.last_name,"category_list":data["list"]}
    return render_to_response("categories.html",ctx,context_instance=RequestContext(request))
 
 def remove_category(request):
