@@ -1,18 +1,17 @@
 # Create your views here.
 
-# from django.contrib.auth import authenticate, login
-
-from django.shortcuts import render_to_response, render
-from django.http import HttpResponse
+from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.core.context_processors import csrf
+from django.contrib.auth import authenticate, login, logout
+#from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 
 import json
 import requests
 
 url = "http://localhost:8080/" 
 
-user = "user"
 course = "course"
 category = "category"
 announcement = "announcement"
@@ -25,25 +24,91 @@ headers = {'content-type': 'application/json', 'charset': 'utf-8'}
 
 def home(request):
    return render_to_response('home.html')
+
+#
+# User login related stuff
+#
+
+# Sign Up function
+def signup(request):
+   return render_to_response("signup.html")
+
+def signin(request):
+   return render_to_response("login.html")
+
+def login_user(request):
+   global url, user
+   email = request.POST['email']
+   password = request.POST['password']
+   user = authenticate(username=email, password=password)
+   if user is not None:
+      if user.is_active:
+         login(request, user)
+         ctx = {"fName": user.first_name, "lName": user.last_name }
+         return render_to_response("home.html",ctx,context_instance=RequestContext(request))
+      else:
+         # Return a 'disabled account' error message
+         ctx = {"message" :"Login Failed. Please try Again"}
+         return render_to_response("login.html",ctx,context_instance=RequestContext(request))
+   else:
+         ctx = {"message" :"Login Failed. Please try Again"}
+         return render_to_response("login.html",ctx,context_instance=RequestContext(request))
+      
+#       response = requests.get(url + user + "/" + email)
+#       data = response.json()
+#       if data is not None: 
+#          print data
+#          pwd = data["pwd"]
+# 
+#          if password == pwd:
+#             ctx = {"fName": data["fName"], "lName": data["lName"]}
+#             data['Status'] = 1
+#             update_user_util(data)
+#             return render_to_response("home.html",ctx,context_instance=RequestContext(request))
+#       else:         
+#          ctx = {"message": "Login Failed"}
+#          return render_to_response("login.html",ctx)
+
+def change_password(request):
+   user = User.objects.get(username__exact=request.POST.get('email'))
+   user.set_password(request.POST.get('new_password'))
+   user.save()
+      
+
+# log out function
+def logout_user(request):
+   logout(request)
+   return render_to_response('login.html')   
+
+
+
 #
 # user
 #
 
 def add_user(request):
-   global url, headers, user
-   c = {}
+   global url, headers
+   ctx = {}
    if request.method == "POST" :
       email = request.POST.get("email")
       password = request.POST.get('password')
       firstname = request.POST.get('firstname')
       lastname = request.POST.get('lastname')
+
+      local_user = User.objects.create_user(email, email, password)
+      local_user.first_name = firstname
+      local_user.last_name = lastname
+      local_user.save()
          
       payload = {"_id": email,"pwd": password,"fName": firstname,"lName":lastname}
-      print '---> payload:',payload
-      response = requests.post(url + user, data=json.dumps(payload), headers=headers)
+      response = requests.post(url + "user", data=json.dumps(payload), headers=headers)
       if response.status_code == 200:
-         c.update(csrf(request))
-   return render_to_response("home.html", c)
+         ctx.update(csrf(request))
+         return render_to_response("login.html",ctx,context_instance=RequestContext(request))
+      else :
+         ctx = {"message" : "Sign Up Failed. Please Try Again"}
+         return render_to_response("signup.html", ctx)
+
    
 def get_user(request):
    global url, headers, user
@@ -69,7 +134,7 @@ def update_user(request):
 #
 # Course
 #
-
+#@login_required(login_url='login') -- > Good to have, need to figure out usage.
 def add_course(request):
    global url, headers, course
    payload = {"_id":"course1","category":"annonymous_1","title":"introduction to algebra","section":2,"dept":"eng","term":"Spring","year":2013,"instructor":[{"name":"russel Doe","id":29}],"days":["Monday","Wednesday","Friday"],"hours":["8:00AM","9:15:AM"],"Description":"My course","attachment":"PATH","version":"1"}
@@ -147,13 +212,13 @@ def remove_category(request):
    global url, headers, category
    
    name = request.GET.get('id')
-   response = requests.delete("http://localhost:8080/category/" + name)
+   requests.delete("http://localhost:8080/category/" + name)
    return list_category(request)
    
 
 def update_category(request):
    global url, headers, category
-   id = request.GET.get('id')
+   request.GET.get('id')
    
    response = requests.get("http://localhost:8080/category/" + id)
    print '--->Category:update=', response.text
@@ -257,68 +322,6 @@ def update_quiz():
    payload = {"_id": "disid1","courseId": "courseId","title": "Title","description": "desc","messages": [{"messages": "msg1234","user": "user1","postDate": "DATE"},{"messages": "msg2","user": "user2","postDate": "DATE"}]}
    response = requests.put(url + course, data=json.dumps(payload), headers=headers)
    print response.text
-
-def signin(request):
-   c = {}
-   c.update(csrf(request))
-   return render_to_response("login.html", c)
-
-def login(request):
-   global url, user
-   if request.method == "POST" :
-      email = request.POST.get("email")
-      password = request.POST.get("password")
-         
-      response = requests.get(url + user + "/" + email)
-      data = response.json() 
-      print data
-      pwd = data["pwd"]
-
-      if password == pwd:
-         ctx = {"fName": data["fName"], "lName": data["lName"]}
-         data['Status'] = 1
-         update_user_util(data)
-         return render_to_response("home.html",ctx,context_instance=RequestContext(request))
-   
-   c = {}
-   c.update(csrf(request))
-   return render_to_response("login.html", c)
-      
-# Sign Up function
-def signup(request):
-   c = {}
-   c.update(csrf(request))
-   return render_to_response("signUp.html", c)
-
-
-# signup_home page fucntion is called when there is new user entry
-def signup_home(request):
-   global endpoint
-   if request.POST:
-      username = request.POST.get('username')
-      password = request.POST.get('password')
-      firstname = request.POST.get('firstname')
-      lastname = request.POST.get('lastname')
-
-   payload = { "email":username,"pwd":password,"fName":firstname,"lName":lastname} 
-   print "Calling bottle from Django ......from SignUp Home "
-   r = requests.post(endpoint + "signup",data=json.dumps(payload))
-   print str(r)+" ---- > Call Back from Bottle Achieved "
-   ctx = r.json()
-   print ctx
-   return render_to_response("signin.html",ctx,context_instance=RequestContext(request))
-   #return render(request, "home.html",{"email": email})
-
-# log out function
-def logout(request):
-   global url, user
-   r = requests.get("http://localhost:8080/user/sugandhi@abc.com")
-   ctx = r.json()
-   print ctx
-   ctx['Status'] = 0
-   update_user_util(ctx)
-   return render_to_response('login.html')   
-
 
 #
 # Utility Methods

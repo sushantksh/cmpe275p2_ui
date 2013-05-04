@@ -11,10 +11,10 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '/data/sqllite/db',                      # Or path to database file if using sqlite3.
+        'NAME': os.path.join(os.path.dirname(__file__), 'user_db').replace('\\','/'),
         # The following settings are not used with sqlite3:
-        'USER': '',
-        'PASSWORD': '',
+        'USER': 'cmpe275',
+        'PASSWORD': 'cmpe275',
         'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '',                      # Set to empty string for default.
     }
@@ -36,6 +36,7 @@ LANGUAGE_CODE = 'en-us'
 
 SITE_ID = 1
 
+LOGIN_URL = '/login'
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = True
@@ -97,7 +98,7 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+#     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
@@ -109,13 +110,8 @@ ROOT_URLCONF = 'cmpe275p2_ui.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'cmpe275p2_ui.wsgi.application'
 
-print os.path.join(os.path.dirname(__file__), 'mooc/html').replace('\\','/').replace('cmpe275p2_ui/cmpe275p2_ui',"cmpe275p2_ui")
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
     os.path.join(os.path.dirname(__file__), 'mooc/html').replace('\\','/').replace('cmpe275p2_ui/cmpe275p2_ui',"cmpe275p2_ui"),
-#    "/Users/mdhoble/SJSU/CMPE-275/Projects/cmpe275p2_ui/mooc/html"    
 )
 
 INSTALLED_APPS = (

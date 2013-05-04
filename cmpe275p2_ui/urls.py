@@ -8,14 +8,19 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-  	 url(r'^$', mooc.views.signin),
     url(r'^home$', mooc.views.home),
-    url(r'^signup$', mooc.views.signup),
-    url(r'^signup/$', mooc.views.signup),
-    url(r'^login$', mooc.views.login),
-    url(r'^logout', mooc.views.logout),
+    url(r'^signup$', mooc.views.signup), #Only Takes care of Loading the Sign Up HTML Page.
+    url(r'^signin$', mooc.views.signin), #Only Takes care of Loading the Sign In HTML Page.
+    url(r'^login$', mooc.views.login_user),
+    url(r'^logout', mooc.views.logout_user),
+
+    url(r'^add_user$', mooc.views.add_user), # Handles User Sign Up Form.
+    url(r'^get_user$', mooc.views.get_user),
+#     url(r'^list_user$', mooc.views.list_user),
+    url(r'^update_user$', mooc.views.update_user),
+    url(r'^remove_user$', mooc.views.remove_user),
+    url(r'^assets$', mooc.views.remove_user),    
     
-    url(r'^signup_home$', mooc.views.signup_home),
     url(r'^add_course$', mooc.views.add_course),
     url(r'^get_course$', mooc.views.get_course),
     url(r'^list_course$', mooc.views.list_course),
@@ -46,13 +51,6 @@ urlpatterns = patterns('',
     url(r'^list_quiz$', mooc.views.list_quiz),
     url(r'^update_quiz$', mooc.views.update_quiz),
     url(r'^remove_quiz$', mooc.views.remove_quiz),
-
-    url(r'^add_user$', mooc.views.add_user),
-    url(r'^get_user$', mooc.views.get_user),
-#     url(r'^list_user$', mooc.views.list_user),
-    url(r'^update_user$', mooc.views.update_user),
-    url(r'^remove_user$', mooc.views.remove_user),
-    url(r'^assets$', mooc.views.remove_user),    
     
     
 # Uncomment the admin/doc line below to enable admin documentation:
