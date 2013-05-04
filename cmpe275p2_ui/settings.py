@@ -158,4 +158,4 @@ LOGGING = {
 }
 
 # Append Slash to request
-APPEND_SLASH = False
+# APPEND_SLASH = False
