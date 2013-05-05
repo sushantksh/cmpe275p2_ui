@@ -61,19 +61,24 @@
 
     <div class="container">
 
-      <form class="form-signin">
+      <form class="form-signin" method="post" action="/add_course">
         <h2 class="form-signin-heading">Add Course</h2>
 	    <label class="control-label" for="textarea">Course Title</label>  
         <input type="text" class="input-block-level" placeholder="Course Title" id="title">
-	    <label class="control-label" for="textarea">Course Description</label>  
-	             <div class="controls">  
-	               <textarea class="input-xlarge" id="courseDescription" rows="3"></textarea>  
-	             </div>  
 	    <label class="control-label" for="textarea">Course Category</label>  
-				 <select id="categoryId">
-					 <option>Option 1</option>
-					 <option>Option 2</option>
-				 </select>
+        <input type="text" class="input-block-level" placeholder="Course Category" id="category">
+	    <label class="control-label" for="textarea">Section</label>  
+        <input type="text" class="input-block-level" placeholder="Section" id="section">
+	    <label class="control-label" for="textarea">Dept</label>  
+        <input type="text" class="input-block-level" placeholder="Course Title" id="dept">
+	    <label class="control-label" for="textarea">Term</label>  
+        <input type="text" class="input-block-level" placeholder="Course Title" id="term">
+	    <label class="control-label" for="textarea">Instructor</label>  
+        <input type="text" class="input-block-level" placeholder="Course Title" id="instructor">
+	    <label class="control-label" for="textarea">Day</label>  
+        <input type="text" class="input-block-level" placeholder="Course Title" id="day">
+	    <label class="control-label" for="textarea">File Store</label>  
+        <input type="text" class="input-block-level" placeholder="Course Title" id="attachment">
         <button class="btn btn-large btn-primary" type="submit">Add Course</button>
       </form>
 
