@@ -206,24 +206,38 @@ def get_category(request):
    global url, category, latest_mooc_list, selected_mooc
    
    name = request.GET.get('id')
-   response = requests.get(url + category + "/" + name)
-   if response.status_code == 200:
-      data = response.json()
-      print '--->get_category:data=', data
-      ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group, "name": data["name"], "desc":data["description"]}
-      return render_to_response("viewCategory.html",ctx)
-   else:
-      return list_category(request, "Failed to get category!!")
+   if name is not -1 :
+      file_str = StringIO()
+      file_str.write(url)
+      file_str.write('/category/')
+      file_str.write(name)
+   
+      tempUrl = file_str.getvalue()
+      response = requests.get(tempUrl)
+      if response.status_code == 200:
+         data = response.json()
+         print '--->get_category:data=', data
+         ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group, "name": data["name"], "desc":data["description"]}
+         return render_to_response("viewCategory.html",ctx)
+
+   return list_category(request, "Failed to get category!!")
    
 def remove_category(request):
    global url, category, headers, latest_mooc_list, selected_mooc
    
    name = request.GET.get('id')
-   response = requests.delete(url + category + "/" + name)
-   if response.status_code == 200:
-      return list_category(request, "Category removed!!!")
-   else:
-      return list_category(request, "Failed to remove category!!")
+   if name is not -1 :
+      file_str = StringIO()
+      file_str.write(url)
+      file_str.write('/category/')
+      file_str.write(name)
+      
+      tempUrl = file_str.getvalue()
+      response = requests.delete(tempUrl)
+      if response.status_code == 200:
+         return list_category(request, "Category removed!!!")
+
+   return list_category(request, "Failed to remove category!!")
 
 
 # enroll user
