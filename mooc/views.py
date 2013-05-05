@@ -7,11 +7,13 @@ from django.contrib.auth import authenticate, login, logout
 #from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from mooc.models import MOOC
+from time import localtime, strftime
+from cStringIO import StringIO
 
 import json
 import requests
 
-url = "http://localhost:8080/" 
+url = "http://localhost:8080" 
 
 course = "course"
 category = "category"
@@ -22,129 +24,209 @@ quiz = "quiz"
 lst = "/list"
 
 latest_mooc_list = None
+selected_mooc = None
+default_mooc = None
 
 headers = {'content-type': 'application/json', 'charset': 'utf-8'}
 
+# index function
 def index(request):
-   return render_to_response('login.html')
-
-def home(request):
-   mooc_id = request.GET.get('id')
-   if mooc_id != None :
-      mooc = MOOC.objects.get(pk=mooc_id)
-      url = mooc.get_primary_url()
+   global latest_mooc_list, url, selected_mooc
    
-   ctx = {"fName": user.first_name, "lName": user.last_name, "latest_mooc_list": latest_poll_list }
-   return render_to_response('home.html')
-url
-#
-# User login related stuff
-#
+   latest_mooc_list = MOOC.objects.all()
+   for mooc in latest_mooc_list :
+      if mooc.is_default :
+         print 'Index Primary URL ===>', mooc.group
+         selected_mooc = mooc
+         break
+   print 'Index Primary URL ===>', selected_mooc.group
+   return render_to_response("login.html")
 
-# Sign Up function
+# Sign-Up function
 def signup(request):
    return render_to_response("signup.html")
 
-def signin(request):
-   return render_to_response("login.html")
+# add user
+def add_user(request):
+   global url, headers
+   
+   ctx = {}
+   email = request.POST.get('email')
+   password = request.POST.get('password')
+   firstname = request.POST.get('firstname')
+   lastname = request.POST.get('lastname')
 
+   try: 
+      local_user = User.objects.create_user(email, email, password)
+      local_user.first_name = firstname
+      local_user.last_name = lastname
+      local_user.save()
+   except: 
+      ctx = {"message" : "User ID Exists. Please Try Again"}
+      return render_to_response("signup.html", ctx)
+     
+   payload = {"_id":email, "own":[], "enrolled":[], "quizzes":[]} 
+   response = requests.post(url + "user", data=json.dumps(payload), headers=headers)
+   if response.status_code == 200 or response.status_code == 201:
+      ctx = {"message" : "User successfully registered, please login to continue."}
+      return render_to_response("login.html",ctx,context_instance=RequestContext(request))
+   else :
+      ctx = {"message" : "Sign Up Failed. Please Try Again"}
+      return render_to_response("signup.html", ctx)
+
+# User login related stuff
 def login_user(request):
-   latest_poll_list = MOOC.objects.all()
-    
+   global latest_mooc_list, selected_mooc
+   
    email = request.POST['email']
    password = request.POST['password']
-   print password
+   
    user = authenticate(username=email, password=password)
    if user is not None:
       if user.is_active:
          login(request, user)
-         ctx = {"fName": user.first_name, "lName": user.last_name, "latest_mooc_list": latest_poll_list }
-         return render_to_response("home.html",ctx,context_instance=RequestContext(request))
+         ctx = {"fName": user.first_name, "lName": user.last_name, "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group }
+         return render_to_response("home.html",ctx)
       else:
          # Return a 'disabled account' error message
          ctx = {"message" :"Login Failed. Please try Again"}
-         return render_to_response("login.html",ctx,context_instance=RequestContext(request))
+         return render_to_response("login.html",ctx)
    else:
          ctx = {"message" :"Login Failed. Please try Again"}
-         return render_to_response("login.html",ctx,context_instance=RequestContext(request))
+         return render_to_response("login.html",ctx)
       
-def change_password(request):
-   print "New Password",request.POST.get('password')
-   print request.user.first_name
-   request.user.set_password(request.POST.get('password'))
-   request.user.save()
-   ctx = {"fName": request.user.first_name, "lName": request.user.last_name }
-   return render_to_response("home.html",ctx,context_instance=RequestContext(request))      
+def home(request):
+   global latest_mooc_list, selected_mooc, url
+   
+   mooc_id = request.GET.get('id')
+   if mooc_id is not None :
+      selected_mooc = MOOC.objects.get(pk=mooc_id)
+      url = selected_mooc.primary_URL
+   print 'Home Primary URL ===>', url
+   ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group }
+   return render_to_response('home.html',ctx)
+      
+def profile(request):
+   global latest_mooc_list, selected_mooc
+   
+   ctx = {"fName" :request.user.first_name, "lName": request.user.last_name, "email":request.user.username, "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group}
+   return render_to_response("profile.html",ctx)
 
+def update_user(request):
+   global latest_mooc_list, selected_mooc
+   
+   password = request.POST['password']
+   firstname = request.POST.get('firstname')
+   lastname = request.POST.get('lastname')
+   
+   if password is not None:
+      request.user.set_password(password)
+   if firstname is not None:
+      request.user.first_name = firstname
+   if lastname is not None:
+      request.user.last_name = lastname
+   request.user.save()
+
+   ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group }
+   return render_to_response('home.html',ctx)
+     
 # log out function
 def logout_user(request):
    logout(request)
    return render_to_response('login.html')   
 
+# category
+def list_category(request, msg=''):
+   global url, category, lst, latest_mooc_list, selected_mooc
+   
+   file_str = StringIO()
+   file_str.write(url)
+   file_str.write('/category/list')
 
+   tempUrl = file_str.getvalue()
+   print 'URL-->', tempUrl
+   response = requests.get(tempUrl)
+   data = response.json()
+   print '--->Category:data=', data
+   ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "category_list":data["list"], "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group, "message":msg }
+   return render_to_response("categories.html",ctx)
 
-#
-# user
-#
-
-def add_user(request):
-   global url, headers
-   ctx = {}
-
-   if request.method == "POST" :
-      email = request.POST.get("email")
-      password = request.POST.get('password')
-      firstname = request.POST.get('firstname')
-      lastname = request.POST.get('lastname')
-
-      try: 
-         local_user = User.objects.create_user(email, email, password)
-         local_user.first_name = firstname
-         local_user.last_name = lastname
-         local_user.save()
-      except: 
-         ctx = {"message" : "User ID Exists. Please Try Again"}
-         return render_to_response("signup.html", ctx)
-         
-      payload = {"_id": email,"pwd": password,"fName": firstname,"lName":lastname}
-      response = requests.post(url + "user", data=json.dumps(payload), headers=headers)
+def category(request):
+   global latest_mooc_list, selected_mooc
+   
+   name = request.GET.get('id')
+   if name is not None:
+      file_str = StringIO()
+      file_str.write(url)
+      file_str.write('/category/')
+      file_str.write(name)
+      
+      tempUrl = file_str.getvalue()
+      print 'URL-->', tempUrl       
+      response = requests.get(tempUrl)
       if response.status_code == 200:
-         return render_to_response("login.html",ctx,context_instance=RequestContext(request))
-      else :
-         ctx = {"message" : "Sign Up Failed. Please Try Again"}
-         return render_to_response("signup.html", ctx)
+         data = response.json()
+         print '--->category:data=', data
+         
+         ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group, "id":data["id"], "name": data["name"], "desc":data["description"]}
+         return render_to_response("addCategory.html",ctx)
+      
+   ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "id":"-1", "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group}
+   return render_to_response("addCategory.html",ctx)
 
+def add_category(request):
+   global url, category, headers, latest_mooc_list, selected_mooc
+
+   cat_id = request.POST.get('catId')
+   name = request.POST.get('catName')
+   desc = request.POST.get('catDesc')
    
-def get_user(request):
-   global url, headers
-   response = requests.get(url + "user/" + request.user.user_name)
-   print response.json()
+   if cat_id == -1 :
+      payload = {"name":name, "description":desc, "createDate":strftime("%Y-%m-%d %H:%M:%S", localtime()), "status":0}    
+   else :
+      payload = {"_id":cat_id, "name":name, "description":desc, "createDate":strftime("%Y-%m-%d %H:%M:%S", localtime()), "status":0} 
    
-def list_user(request):
-   global url, headers, user, lst
-   response = requests.get(url + user + lst)
-   print response.json()
+   print '--->add_category:data=', payload
+   file_str = StringIO()
+   file_str.write(url)
+   file_str.write('/category')
+   
+   tempUrl = file_str.getvalue()
+   response = requests.post(tempUrl, json.dumps(payload), headers=headers)
+   if response.status_code == 200 or response.status_code == 201:
+       if cat_id == -1 :
+           return list_category(request, "Category added!!!")
+       else:
+           return list_category(request, "Category edited!!!")
+   else:
+      ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "id":cat_id, "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group, "message":"Failed to add Category" }
+      return render_to_response("addCategory.html",ctx)
+   
+def get_category(request):
+   global url, category, latest_mooc_list, selected_mooc
+   
+   name = request.GET.get('id')
+   response = requests.get(url + category + "/" + name)
+   if response.status_code == 200:
+      data = response.json()
+      print '--->get_category:data=', data
+      ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group, "name": data["name"], "desc":data["description"]}
+      return render_to_response("viewCategory.html",ctx)
+   else:
+      return list_category(request, "Failed to get category!!")
+   
+def remove_category(request):
+   global url, category, headers, latest_mooc_list, selected_mooc
+   
+   name = request.GET.get('id')
+   response = requests.delete(url + category + "/" + name)
+   if response.status_code == 200:
+      return list_category(request, "Category removed!!!")
+   else:
+      return list_category(request, "Failed to remove category!!")
 
-def remove_user(request):
-   global url, headers, user
-   response = requests.delete(url + user +"/sugandhi@abc.com")
-   print response.text
 
-def profile(request):
-   data = {"fName" :request.user.first_name, "lName": request.user.last_name, "password" :request.user.password}
-   ctx = {"fName": request.user.first_name, "lName": request.user.last_name,"user_detail":data}
-
-   return render_to_response("profile.html",ctx,context_instance=RequestContext(request))
-
-def update_user(request):
-   data = {"fName" :request.user.first_name, "lName": request.user.last_name, "password" :request.user.password}
-   ctx = {"fName": request.user.first_name, "lName": request.user.last_name,"user_detail":data}
-
-   return render_to_response("profile.html",ctx,context_instance=RequestContext(request))
-
-   payload = {"_id": "disid1","courseId": "courseId","title": "Title","description": "desc","messages": [{"messages": "msg1234","user": "user1","postDate": "DATE"},{"messages": "msg2","user": "user2","postDate": "DATE"}]}
-   print update_user_util(payload)
-
+# enroll user
 def enroll_user(request):
    global headers, url, course
    course_id = request.GET.get('id')
@@ -186,69 +268,6 @@ def update_course():
    payload = {"_id":"course1","category":"annonymous_1","title":"machine learning","section":2,"dept":"eng","term":"Spring","year":2013,"instructor":[{"name":"russel Doe","id":29}],"days":["Monday","Wednesday","Friday"],"hours":["8:00AM","9:15:AM"],"Description":"My course","attachment":"PATH","version":"1"}
    response = requests.put(url + course, data=json.dumps(payload), headers=headers)
    print response.text
-#
-# Category
-#
-
-def category(request):
-   return render_to_response("addCategory.html")
-
-def add_category(request):
-   global url, headers, category
-   global endpoint
-   if request.POST:
-      name = request.POST.get('catName')
-      payload = {"_id":name, "name":name, "description":"desc", "createDate":"01-01-2013", "status":0}
-      data=json.dumps(payload)
-      print '--->AddCategory:data=', data
-      response = requests.post("http://localhost:8080/category", data, headers=headers)
-      if response.status_code == 200:
-         print 'SUCCESS'
-   return list_category(request)
-   
-def get_category(request):
-   global url, headers, category
-   global endpoint
-   
-   name = request.GET.get('id')
-   response = requests.get("http://localhost:8080/category/" + name)
-   print '--->Category:List', response.text
-   data = response.json()
-   print '--->Category:data=', data
-   ctx = {"category": data["name"]}
-
-   return render_to_response("viewCategory.html",ctx,context_instance=RequestContext(request))   
-   
-def list_category(request):
-   global url, category, lst
-   global endpoint
-   response = requests.get("http://localhost:8080/category/list")
-   print '--->Category:List', response.text
-   data = response.json()
-   print '--->Category:data=', data
-   ctx = {"fName": request.user.first_name, "lName": request.user.last_name,"category_list":data["list"]}
-   return render_to_response("categories.html",ctx,context_instance=RequestContext(request))
-
-def remove_category(request):
-   global url, headers, category
-   
-   name = request.GET.get('id')
-   requests.delete("http://localhost:8080/category/" + name)
-   return list_category(request)
-   
-
-def update_category(request):
-   global url, headers, category
-   request.GET.get('id')
-   
-   response = requests.get("http://localhost:8080/category/" + id)
-   print '--->Category:update=', response.text
-   data = response.json()
-   print '--->Category:data=', data
-   ctx = {"category": data["name"]}
-   ctx.update(csrf(request))
-
-   return render_to_response("addCategory.html",ctx,context_instance=RequestContext(request))
 
 #
 # announcement

@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Sign in</title>
+    <title>Sign Up</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -58,23 +58,58 @@
   </head>
 
   <body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="#">Mooc: {{selectedMooc}}</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a href="/mooc/home/">Home</a></li>
+              <li><a href="/mooc/list_category/">Categories</a></li>
+              <li><a href="/mooc/list_course/">Courses</a></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">MOOCS<b class="caret"></b></a>
+                {% if latest_mooc_list %}
+                	<ul class="dropdown-menu">
+				    {% for mooc in latest_mooc_list %}
+        				<li><a href="/mooc/home/?id={{ mooc.id }}/">{{ mooc.group }}</a></li>
+    				{% endfor %}
+    				</ul>
+				{% else %}
+    				<p>No moocs registered.</p>
+				{% endif %}
+              </li>
+              <li style="width:200px;padding-left:100px;padding-top:8px"><font color="white"><b>Welcome {{ fName }} {{ lName }} !</b></font></li>
+              <li class="active"><a href="#">Profile</a></li>
+              <li><a href="/mooc/logout/">Logout</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
 
     <div class="container">
-
-	  <form name="LoginForm" class="form-signin" action="/mooc/login/" method="POST">
-	    <h5>{{ message }}</h5>
-        <h2 class="form-signin-heading">Please sign in</h2>
-        <input type="text" class="input-block-level" placeholder="Email address" name="email">
-        <input type="password" class="input-block-level" placeholder="Password" name="password">
-
-        <button class="btn btn-large btn-primary" type="submit">Sign in</button>
-      
-        <br>
-        <br>
-        <h4>Not Registered Yet ?</h4>
-        <a href="/mooc/signup"><button class="btn btn-large btn-primary" type="button">Register</button></a>
-	  </form>
-    </div> <!-- /container -->
+      <div class=row>
+	      <form name="MyForm" class="form-signin" action="/mooc/update_user/" method="post">
+	      	<h5>{{message}}</h5>
+	      	<h2 class="form-signin-heading">User Profile</h2>
+	        <label class="control-label" for="password">{{email}}</label>
+	        <input type="password" class="input-block-level" placeholder="New Password" name="password">
+	        <input type="text" class="input-block-level" placeholder="First Name" name="firstname" value="{{fName}}">
+	        <input type="text" class="input-block-level" placeholder="Last Name" name="lastname" value="{{lName}}">
+	        <button class="btn btn-large btn-primary" type="submit">Submit</button>
+	      </form>
+	      </div>
+      <hr>
+      <footer>
+        <p>&copy; Annonymous Group 2013</p>
+      </footer>
+    </div>
 
     <!-- Le javascript
     ================================================== -->

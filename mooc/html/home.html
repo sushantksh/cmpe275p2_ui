@@ -31,7 +31,6 @@
   </head>
 
   <body>
-
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
@@ -40,7 +39,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="brand" href="#">CMPE 275 Project 2</a>
+          <a class="brand" href="#">Mooc: {{selectedMooc}}</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
               <li class="active"><a href="#">Home</a></li>
@@ -51,15 +50,15 @@
                 {% if latest_mooc_list %}
                 	<ul class="dropdown-menu">
 				    {% for mooc in latest_mooc_list %}
-        				<li><a href="/mooc/home/?id={{ mooc.id }}/">{{ mooc.group }}</a></li>
+        				<li><a href="/mooc/home/?id={{ mooc.id }}">{{ mooc.group }}</a></li>
     				{% endfor %}
     				</ul>
 				{% else %}
     				<p>No moocs registered.</p>
 				{% endif %}
               </li>
-              <li style="width:250px;padding-left:150px;padding-top:8px"><font color="white"><b>Welcome {{ fName }} {{ lName }} !</b></font></li>
-              <li><a href="/mooc/update_user/">Profile</a></li>
+              <li style="width:200px;padding-left:100px;padding-top:8px"><font color="white"><b>Welcome {{ fName }} {{ lName }} !</b></font></li>
+              <li><a href="/mooc/profile/">Profile</a></li>
               <li><a href="/mooc/logout/">Logout</a></li>
             </ul>
           </div><!--/.nav-collapse -->
@@ -71,10 +70,12 @@
 
       <!-- Main hero unit for a primary marketing message or call to action -->
       <div class="hero-unit">
-        <h3>CMPE 275 Project 2 Goals:</h3>
-        <p>Collaborative MOOCs with competitive groups within a MOOC.</p>
-        <p>MOOC specification allows your web stack to connect and interact between/across Monday and Wednesday sections.</p>
-        <p><a href="#" class="btn btn-primary btn-large">Learn more &raquo;</a></p>
+        <h2>CMPE 275 Project 2</h2>
+        <h5>Goals:</h5>
+        <ul>
+         <li><p>Collaborative MOOCs with competitive groups within a MOOC.</p></li>
+         <li><p>MOOC specification allows your web stack to connect and interact between/across Monday and Wednesday sections.</p></li>
+        </ul>
       </div>
       <hr>
 

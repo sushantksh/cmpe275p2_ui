@@ -4,22 +4,23 @@ from mooc import views
 
 urlpatterns = patterns('',
     url(r'^$', views.index, name='index'),
-
-    url(r'^home/$', views.home),
     url(r'^signup/$', views.signup), #Only Takes care of Loading the Sign Up HTML Page.
-    url(r'^signin/$', views.signin), #Only Takes care of Loading the Sign In HTML Page.
+    url(r'^add_user/$', views.add_user), # Handles User Sign Up Form.
     url(r'^login/$', views.login_user, name='signin'),
-    url(r'^logout/$', views.logout_user),
+    url(r'^home/$', views.home),
+    
     url(r'^profile/$', views.profile),
-    url(r'^change_password/$', views.change_password),
+    url(r'^update_user/$', views.update_user),
+    url(r'^logout/$', views.logout_user),
+    
+    url(r'^list_category/$', views.list_category),
+    url(r'^category/$', views.category),
+    url(r'^add_category/$', views.add_category),
+    url(r'^get_category/$', views.get_category),
+    url(r'^remove_category/$', views.remove_category),
+    
     url(r'^enroll/$', views.enroll_user),
 
-    url(r'^add_user/$', views.add_user), # Handles User Sign Up Form.
-    url(r'^get_user$/', views.get_user),
-#     url(r'^list_user$', views.list_user),
-    url(r'^update_user/$', views.update_user),
-    url(r'^remove_user/$', views.remove_user),
-    url(r'^assets/$', views.remove_user),    
     
     url(r'^add_course/$', views.add_course),
     url(r'^get_course/$', views.get_course),
@@ -27,12 +28,7 @@ urlpatterns = patterns('',
     url(r'^update_course/$', views.update_course),
     url(r'^remove_course/$', views.remove_course),
 
-    url(r'^category/$', views.category),
-    url(r'^add_category/$', views.add_category),
-    url(r'^get_category/$', views.get_category),
-    url(r'^list_category/$', views.list_category),
-    url(r'^update_category/$', views.update_category),
-    url(r'^remove_category/$', views.remove_category),
+
 
     url(r'^add_announcement/$', views.add_announcement),
     url(r'^get_announcement/$', views.get_announcement),
