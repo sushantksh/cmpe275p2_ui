@@ -7,11 +7,10 @@ TEMPLATE_DEBUG = DEBUG
 ADMINS = (('Manoj Dhoble', 'mdhoble@gmail.com'),)
 
 MANAGERS = ADMINS
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': os.path.join(os.path.dirname(__file__), 'user_db').replace('\\','/'),
+        'NAME': os.path.join(os.path.dirname(__file__), 'mooc/user_db').replace('\\','/').replace('cmpe275p2_ui/cmpe275p2_ui',"cmpe275p2_ui"),
         # The following settings are not used with sqlite3:
         'USER': 'cmpe275',
         'PASSWORD': 'cmpe275',
@@ -73,7 +72,6 @@ STATICFILES_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(os.path.dirname(__file__), 'mooc/assets').replace('\\','/').replace('cmpe275p2_ui/cmpe275p2_ui',"cmpe275p2_ui"),
-#    "/Users/mdhoble/SJSU/CMPE-275/Projects/cmpe275p2_ui/mooc/assets",
 )
 
 # List of finder classes that know how to find static files in
@@ -100,7 +98,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    # Uncomment the next line for simple clickjacking protection:
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
@@ -117,14 +114,12 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    # 'django.contrib.sites',
+    'django.contrib.comments',
+    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Uncomment the next line to enable the admin:
     'django.contrib.admin',
-    # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
-    "mooc",
+    'mooc',
 )
 
 # A sample logging configuration. The only tangible logging
