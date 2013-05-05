@@ -29,17 +29,21 @@ default_mooc = None
 
 headers = {'content-type': 'application/json', 'charset': 'utf-8'}
 
-# index function
-def index(request):
+# store mooc
+def store_mooc():
    global latest_mooc_list, url, selected_mooc
    
    latest_mooc_list = MOOC.objects.all()
    for mooc in latest_mooc_list :
       if mooc.is_default :
-         print 'Index Primary URL ===>', mooc.group
+         print 'store_mooc Primary URL ===>', mooc.group
          selected_mooc = mooc
-         break
-   print 'Index Primary URL ===>', selected_mooc.group
+         break    
+   print 'store_mooc Primary URL ===>', selected_mooc.group
+
+# index function
+def index(request):
+   store_mooc()
    return render_to_response("login.html")
 
 # Sign-Up function
@@ -78,6 +82,7 @@ def add_user(request):
 def login_user(request):
    global latest_mooc_list, selected_mooc
    
+   store_mooc()
    email = request.POST['email']
    password = request.POST['password']
    
