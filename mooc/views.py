@@ -95,10 +95,27 @@ def add_user(request):
     return render_to_response("login.html",ctx)
 
 
-def get_context(request):
+def get_context(request, msg=None):
     global latest_mooc_list, default_mooc, headers, user_dict
-    
-    return {"fName": request.user.first_name, "lName": request.user.last_name, "latest_mooc_list": latest_mooc_list, "selectedMooc": user_dict[request.user.username]["mooc"]["name"]}
+    ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "latest_mooc_list": latest_mooc_list, "selectedMooc": user_dict[request.user.username]["mooc"]["name"]}
+    if(msg is not None):
+        ctx["message"] = msg
+    if (user_dict[request.user.username]["course"]):
+        ctx["course_id"] = user_dict[request.user.username]["course"]["id"]
+        ctx["course_name"] = user_dict[request.user.username]["course"]["name"]
+    if (user_dict[request.user.username]["category"]):
+        ctx["category_id"] = user_dict[request.user.username]["category"]["id"]
+        ctx["category_name"] = user_dict[request.user.username]["category"]["name"]
+    if (user_dict[request.user.username]["discussion"]):
+        ctx["discussion_id"] = user_dict[request.user.username]["discussion"]["id"]
+        ctx["discussion_name"] = user_dict[request.user.username]["discussion"]["name"]
+    if (user_dict[request.user.username]["announcement"]):
+        ctx["announcement_id"] = user_dict[request.user.username]["announcement"]["id"]
+        ctx["announcement_name"] = user_dict[request.user.username]["announcement"]["name"]
+    if (user_dict[request.user.username]["quiz"]):
+        ctx["quiz_id"] = user_dict[request.user.username]["quiz"]["id"]
+        ctx["quiz_name"] = user_dict[request.user.username]["quiz"]["name"]          
+    return ctx
 
 # User login related stuff
 def login_user(request):
@@ -146,132 +163,158 @@ def profile(request):
     return render_to_response("profile.html",ctx)
 
 def update_user(request):
-   global latest_mooc_list, selected_mooc
+    global latest_mooc_list, default_mooc, headers, user_dict
+    
+    password = request.POST['password']
+    firstname = request.POST.get('firstname')
+    lastname = request.POST.get('lastname')
    
-   password = request.POST['password']
-   firstname = request.POST.get('firstname')
-   lastname = request.POST.get('lastname')
-   
-   if password is not None:
-      request.user.set_password(password)
-   if firstname is not None:
-      request.user.first_name = firstname
-   if lastname is not None:
-      request.user.last_name = lastname
-   request.user.save()
+    if password is not None:
+        request.user.set_password(password)
+    if firstname is not None:
+        request.user.first_name = firstname
+    if lastname is not None:
+        request.user.last_name = lastname
+    request.user.save()
 
-   ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group }
-   return render_to_response('home.html',ctx)
+    ctx = get_context(request)
+    return render_to_response('home.html',ctx)
      
 # log out function
 def logout_user(request):
-    del dict[request.user.username]; # remove entry with key 'Name'
+    global latest_mooc_list, default_mooc, headers, user_dict
+    
+    del user_dict[request.user.username]; # remove entry with key 'Name'
     logout(request)
-    return render_to_response('login.html')   
+    return index(request)
 
-# category
+# list category
 def list_category(request, msg=''):
-   global url, category, lst, latest_mooc_list, selected_mooc
-   
-   file_str = StringIO()
-   file_str.write(url)
-   file_str.write('/category/list')
+    global latest_mooc_list, default_mooc, headers, user_dict
+    
+    ctx = get_context(request, msg)    
+    
+    file_str = StringIO()
+    file_str.write(user_dict[request.user.username]["url"])
+    file_str.write('/category/list')
+    
+    tempUrl = file_str.getvalue()
+    print 'list_category.URL ===>', tempUrl
+    response = requests.get(tempUrl)
+    if response.status_code == 200:
+        data = response.json()
+        print 'list_category:data ===>', data
+        ctx["category_list"] = data["list"]
 
-   tempUrl = file_str.getvalue()
-   print 'URL-->', tempUrl
-   response = requests.get(tempUrl)
-   data = response.json()
-   print '--->Category:data=', data
-   ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "category_list":data["list"], "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group, "message":msg }
-   return render_to_response("categories.html",ctx)
+    return render_to_response("categories.html",ctx)
 
+# show category add / edit page
 def category(request):
-   global latest_mooc_list, selected_mooc
-   
-   name = request.GET.get('id')
-   if name is not None:
-      file_str = StringIO()
-      file_str.write(url)
-      file_str.write('/category/')
-      file_str.write(name)
-      
-      tempUrl = file_str.getvalue()
-      print 'URL-->', tempUrl       
-      response = requests.get(tempUrl)
-      if response.status_code == 200:
-         data = response.json()
-         print '--->category:data=', data
-         
-         ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group, "id":data["id"], "name": data["name"], "desc":data["description"]}
-         return render_to_response("addCategory.html",ctx)
-      
-   ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "id":"-1", "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group}
-   return render_to_response("addCategory.html",ctx)
+    global latest_mooc_list, default_mooc, headers, user_dict
+    
+    ctx = get_context(request)
+    ctx["id"] = "-1"
+    name = request.GET.get('id')
+    if name is not None:
+        file_str = StringIO()
+        file_str.write(user_dict[request.user.username]["url"])
+        file_str.write('/category/')
+        file_str.write(name)
+        
+        tempUrl = file_str.getvalue()
+        print 'category.URL ===>', tempUrl
+        response = requests.get(tempUrl)
+        if response.status_code == 200:
+            data = response.json()
+            print 'category:data ===>', data
+            ctx["id"] = data["id"]
+            ctx["name"] = data["name"]
+            ctx["desc"] = data["description"]
+    
+    return render_to_response("category_add.html",ctx)
 
+# add/edit category form submit request
 def add_category(request):
-   global url, category, headers, latest_mooc_list, selected_mooc
+    global latest_mooc_list, default_mooc, headers, user_dict
+    
+    cat_id = request.POST.get('catId')
+    name = request.POST.get('catName')
+    desc = request.POST.get('catDesc')
+   
+    if cat_id == -1 :
+        data = {"name":name, "description":desc, "createDate":strftime("%Y-%m-%d %H:%M:%S", localtime()), "status":0}    
+    else:
+        data = {"_id":cat_id, "name":name, "description":desc, "createDate":strftime("%Y-%m-%d %H:%M:%S", localtime()), "status":0} 
+    print 'add_category:data ===>', data
 
-   cat_id = request.POST.get('catId')
-   name = request.POST.get('catName')
-   desc = request.POST.get('catDesc')
-   
-   if cat_id == -1 :
-      payload = {"name":name, "description":desc, "createDate":strftime("%Y-%m-%d %H:%M:%S", localtime()), "status":0}    
-   else :
-      payload = {"_id":cat_id, "name":name, "description":desc, "createDate":strftime("%Y-%m-%d %H:%M:%S", localtime()), "status":0} 
-   
-   print '--->add_category:data=', payload
-   file_str = StringIO()
-   file_str.write(url)
-   file_str.write('/category')
-   
-   tempUrl = file_str.getvalue()
-   response = requests.post(tempUrl, json.dumps(payload), headers=headers)
-   if response.status_code == 200 or response.status_code == 201:
-       if cat_id == -1 :
-           return list_category(request, "Category added!!!")
-       else:
-           return list_category(request, "Category edited!!!")
-   else:
-      ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "id":cat_id, "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group, "message":"Failed to add Category" }
-      return render_to_response("addCategory.html",ctx)
-   
-def get_category(request):
-   global url, category, latest_mooc_list, selected_mooc
-   
-   name = request.GET.get('id')
-   if name is not -1 :
-      file_str = StringIO()
-      file_str.write(url)
-      file_str.write('/category/')
-      file_str.write(name)
-   
-      tempUrl = file_str.getvalue()
-      response = requests.get(tempUrl)
-      if response.status_code == 200:
-         data = response.json()
-         print '--->get_category:data=', data
-         ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group, "name": data["name"], "desc":data["description"]}
-         return render_to_response("viewCategory.html",ctx)
-
-   return list_category(request, "Failed to get category!!")
-   
+    file_str = StringIO()
+    file_str.write(user_dict[request.user.username]["url"])
+    file_str.write('/category')
+    
+    tempUrl = file_str.getvalue()
+    print 'add_category.URL ===>', tempUrl
+    response = requests.post(tempUrl, json.dumps(data), headers=headers)
+    if response.status_code == 200 or response.status_code == 201:
+        if cat_id == -1 :
+            return list_category(request, "Category added!!!")
+        else:
+            return list_category(request, "Category edited!!!")
+    
+    ctx = get_context(request, "Failed to add Category")
+    ctx["id"] = data["id"]
+    ctx["name"] = data["name"]
+    ctx["desc"] = data["description"]    
+    
+    return render_to_response("category_add.html",ctx)
+    
 def remove_category(request):
-   global url, category, headers, latest_mooc_list, selected_mooc
+    global latest_mooc_list, default_mooc, headers, user_dict
    
-   name = request.GET.get('id')
-   if name is not -1 :
-      file_str = StringIO()
-      file_str.write(url)
-      file_str.write('/category/')
-      file_str.write(name)
-      
-      tempUrl = file_str.getvalue()
-      response = requests.delete(tempUrl)
-      if response.status_code == 200:
-         return list_category(request, "Category removed!!!")
+    name = request.GET.get('id')
+    if name is not -1 :
+        file_str = StringIO()
+        file_str.write(user_dict[request.user.username]["url"])
+        file_str.write('/category/')
+        file_str.write(name)        
+        
+        tempUrl = file_str.getvalue()
+        print 'remove_category.URL ===>', tempUrl
+        response = requests.delete(tempUrl)
+        if response.status_code == 200:
+            return list_category(request, "Category removed!!!")
 
-   return list_category(request, "Failed to remove category!!")
+    return list_category(request, "Failed to remove category!!")    
+    
+# fetch course list for selected category and show them   
+def category_course(request):
+    global latest_mooc_list, default_mooc, headers, user_dict
+    
+    name = request.GET.get('id')
+    if name != -1 :
+        user_dict[request.user.username]["category"]["id"] = name
+        user_dict[request.user.username]["category"]["name"] = request.GET.get('name')
+        
+        file_str = StringIO()
+        file_str.write(user_dict[request.user.username]["url"])
+        file_str.write('/category/')
+        file_str.write(name)
+   
+        tempUrl = file_str.getvalue()
+        print 'category_course.URL ===>', tempUrl
+        
+        response = requests.get(tempUrl)
+        if response.status_code == 200:
+            data = response.json()
+            print 'category_course:data ===>', data
+            
+            ctx = get_context(request)
+            ctx["course_list"] = data["list"]
+            return render_to_response("courses.html",ctx)
+
+    ctx = get_context(request)
+    return list_category(request, "Failed to get category!!")
+   
+
 
 
 # enroll user

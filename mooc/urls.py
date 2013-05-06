@@ -19,7 +19,7 @@ urlpatterns = patterns('',
     url(r'^add_category/$', views.add_category),
     url(r'^remove_category/$', views.remove_category),
 #    course related views
-    url(r'^category/courses/$', views.get_category),
+    url(r'^category/courses/$', views.category_course),
 
     url(r'^add_course/$', views.add_course),
     url(r'^get_course/$', views.get_course),

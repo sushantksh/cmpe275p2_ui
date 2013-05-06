@@ -57,7 +57,7 @@
                                    <!-- <link rel="shortcut icon" href="/assets/ico/favicon.png"> -->
   </head>
 
-  <body>
+<body>
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
@@ -69,8 +69,8 @@
           <a class="brand" href="#">Mooc: {{selectedMooc}}</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
-              <li><a href="/mooc/home/">Home</a></li>
-              <li class="active"><a href="/mooc/list_category/">Categories</a></li>
+              <li class="active"><a href="#">Home</a></li>
+              <li><a href="/mooc/list_category/">Categories</a></li>
               <li><a href="/mooc/list_course/">Courses</a></li>
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">MOOCS<b class="caret"></b></a>
@@ -92,39 +92,36 @@
         </div>
       </div>
     </div>
-
+    
     <div class="container">
       <div class=row>
-	      <form name="CourseForm" class="form-signin" action="/mooc/add_course/" method="POST">
-	        <h5>{{ message }}</h5>
-	        <h2 class="form-signin-heading">Course</h2>
-		    <input type="hidden" name="catId" value="{{id}}">
-		    <label class="control-label" for="textarea">Course Title</label>  
-	        <input type="text" class="input-block-level" placeholder="Course Title" name="title" value="{{title}}">
-		    <label class="control-label" for="textarea">Course Category</label>  
-	        <input type="text" class="input-block-level" placeholder="Course Category" name="category" value="{{category}}">
-		    <label class="control-label" for="textarea">Section</label>  
-	        <input type="text" class="input-block-level" placeholder="Section" name="section" value="{{section}}">
-		    <label class="control-label" for="textarea">Dept</label>  
-	        <input type="text" class="input-block-level" placeholder="Course Dept" name="dept" value="{{dept}}">
-		    <label class="control-label" for="textarea">Term</label>  
-        	<input type="text" class="input-block-level" placeholder="Course Term" name="term" value="{{term}}">
-		    <label class="control-label" for="textarea">Instructor</label>  
-	        <input type="text" class="input-block-level" placeholder="Course Instructor" name="instructor" value="{{instructor}}">
-		    <label class="control-label" for="textarea">Day</label>  
-	        <input type="text" class="input-block-level" placeholder="Course Days" name="days" value="{{days}}">
-		    <label class="control-label" for="textarea">Description</label>  
-	        <input type="text" class="input-block-level" placeholder="Course Description" name="Description" value="{{Description}}">
-		    <label class="control-label" for="textarea">File Store</label>  
-    	    <input type="text" class="input-block-level" placeholder="Course Attachment" name="attachment" value="{{attachment}}">
-        	<button class="btn btn-large btn-primary" type="submit">Add Course</button>
-	      </form>
-	      </div>
+        <h2 class="form-signin-heading">View Course</h2>
+	    <label class="control-label" for="label">ID</label>
+	    <label class="control-label">{{id}}</label> 
+	    <label class="control-label" for="label">Title</label>
+	    <label class="control-label">{{title}}</label> 
+	    <label class="control-label" for="label">Category</label>
+	    <label class="control-label">{{category}}</label> 
+	    <label class="control-label" for="label">Dept</label>
+	    <label class="control-label">{{dept}}</label> 
+	    <label class="control-label" for="label">Section</label>
+	    <label class="control-label">{{section}}</label> 
+	    <label class="control-label" for="label">Term</label>
+	    <label class="control-label">{{term}}</label> 
+	    <label class="control-label" for="label">Instructor</label>
+	    <label class="control-label">{{instructor}}</label> 
+	    <label class="control-label" for="label">Days</label>
+	    <label class="control-label">{{days}}</label> 
+	    <label class="control-label" for="label">Description</label>
+	    <label class="control-label">{{desc}}</label> 
+	    <label class="control-label" for="label">Attachment</label>
+	    <label class="control-label">{{attachment}}</label> 
+      </div>
       <hr>
       <footer>
         <p>&copy; Annonymous Group 2013</p>
       </footer>
-    </div> <!-- /container -->
+    </div>    
 
     <!-- Le javascript
     ================================================== -->
