@@ -74,7 +74,7 @@
 
     <div class="container">
         <div class="row">
-            <a href="/mooc/course/"><button class="btn" type="button"><b class="icon-plus-sign"></b>Add Course</button></a>
+            <a href="/mooc/course/"><button class="btn" type="button"><b class="icon-plus-sign"></b> Add Course</button></a>
             {% if category %}
                 <h5>Category: {{category_name}}</h5>
             {% endif %}
@@ -99,12 +99,10 @@
                 		<td><a href="/mooc/get_course/?id={{course.id}}">{{course.name}}</a></td>
                 		<td>
                             {% if courses_own %}
-                                {% own_course = selectedMooc + ":" + course.id %}
                                 {% for course_name in courses_own %}
-                                    {% if course_name == own_course %}
+                                    {% if course_name == selectedMooc|add:":"|add:course.id %}
                                         <a href="/mooc/course/?id={{course.id}}"><button class="btn btn-mini" type="button"><i class="icon-pencil"></i> Edit</button></a>
-                                		&nbsp;&nbsp;<a href="/mooc/remove_course/?id={{course.id}}"><button class="btn btn-mini" type="button"><i class="icon-remove-sign"></i></button></a>
-                                        {% break %}
+                                		&nbsp;&nbsp;<a href="/mooc/remove_course/?id={{course.id}}"><button class="btn btn-mini" type="button"><i class="icon-remove-sign"></i> Delete</button></a>
                                     {% endif %}
                                 {% endfor %}
                             {% endif %}

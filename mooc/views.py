@@ -83,37 +83,41 @@ def add_user(request):
         ctx = {"message" : "User ID Exists. Please Try Again"}
         return render_to_response("signup.html", ctx)
      
-    payload = {"_id":email, "own":[], "enrolled":[], "quizzes":[]} 
-    url = default_mooc.primary_URL + "/user"
-    response = requests.post(url, data=json.dumps(payload), headers=headers)
-    if response.status_code != 200 and response.status_code != 201:
-        ctx = {"message" : "Sign Up Failed. Please Try Again"}
-        return render_to_response("signup.html", ctx)
-        
-    ctx = {"message" : "User successfully registered, please login to continue."}
-    return render_to_response("login.html",ctx)
-
+    payload = {"email":email, "own":[], "enrolled":[], "quizzes":[]} 
+    tempUrl = default_mooc.primary_URL + "/user"
+    print 'add_user.URL ===>', tempUrl
+    response = requests.post(tempUrl, data=json.dumps(payload), headers=headers)
+    if response.status_code == 200 or response.status_code == 201:
+        data = response.json()
+        print 'add_user.data ===>', data
+        ctx = {"message" : "User successfully registered, please login to continue."}
+        return render_to_response("login.html",ctx)
+    
+    ctx = {"message" : "Sign Up Failed. Please Try Again"}
+    return render_to_response("signup.html", ctx)
 
 def get_context(request, msg=None):
     global latest_mooc_list, default_mooc, headers, user_dict
     ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "latest_mooc_list": latest_mooc_list, "selectedMooc": user_dict[request.user.username]["mooc"]["name"]}
     if(msg is not None):
         ctx["message"] = msg
-    if (user_dict[request.user.username]["course"]):
-        ctx["course_id"] = user_dict[request.user.username]["course"]["id"]
-        ctx["course_name"] = user_dict[request.user.username]["course"]["name"]
-    if (user_dict[request.user.username]["category"]):
-        ctx["category_id"] = user_dict[request.user.username]["category"]["id"]
-        ctx["category_name"] = user_dict[request.user.username]["category"]["name"]
-    if (user_dict[request.user.username]["discussion"]):
-        ctx["discussion_id"] = user_dict[request.user.username]["discussion"]["id"]
-        ctx["discussion_name"] = user_dict[request.user.username]["discussion"]["name"]
-    if (user_dict[request.user.username]["announcement"]):
-        ctx["announcement_id"] = user_dict[request.user.username]["announcement"]["id"]
-        ctx["announcement_name"] = user_dict[request.user.username]["announcement"]["name"]
-    if (user_dict[request.user.username]["quiz"]):
-        ctx["quiz_id"] = user_dict[request.user.username]["quiz"]["id"]
-        ctx["quiz_name"] = user_dict[request.user.username]["quiz"]["name"]          
+    if(user_dict.has_key(request.user.username)):        
+        temp_dict = user_dict[request.user.username]
+        if(temp_dict.has_key("course")):
+            ctx["course_id"] = user_dict[request.user.username]["course"]["id"]
+            ctx["course_name"] = user_dict[request.user.username]["course"]["name"]
+        if(temp_dict.has_key("category")):        
+            ctx["category_id"] = user_dict[request.user.username]["category"]["id"]
+            ctx["category_name"] = user_dict[request.user.username]["category"]["name"]
+        if(temp_dict.has_key("discussion")):        
+            ctx["discussion_id"] = user_dict[request.user.username]["discussion"]["id"]
+            ctx["discussion_name"] = user_dict[request.user.username]["discussion"]["name"]
+        if(temp_dict.has_key("announcement")):        
+            ctx["announcement_id"] = user_dict[request.user.username]["announcement"]["id"]
+            ctx["announcement_name"] = user_dict[request.user.username]["announcement"]["name"]
+        if(temp_dict.has_key("quiz")):        
+            ctx["quiz_id"] = user_dict[request.user.username]["quiz"]["id"]
+            ctx["quiz_name"] = user_dict[request.user.username]["quiz"]["name"]          
     return ctx
 
 # User login related stuff
@@ -130,7 +134,8 @@ def login_user(request):
             login(request, user)
 #            user logged in successfully, now we need to start tracking his selections
 #            delect any previous selections of this user if present
-            del user_dict[user.username]; # remove entry with key 'Name'
+            if(user_dict.has_key(user.username)):
+                del user_dict[user.username]; # remove entry with key 'Name'
 #            create empty entry in dictionary so that we can add user selections later
             user_dict[user.username] = {"url": default_mooc.primary_URL, "mooc":{"id":default_mooc.id, "name":default_mooc.group}}
             ctx = get_context(request)
@@ -183,7 +188,9 @@ def update_user(request):
 def logout_user(request):
     global latest_mooc_list, default_mooc, headers, user_dict
     
-    del user_dict[request.user.username]; # remove entry with key 'Name'
+    if(user_dict.has_key(request.user.username)):
+        del user_dict[request.user.username]; # remove entry with key 'Name'
+    
     logout(request)
     return index(request)
 
@@ -240,7 +247,7 @@ def add_category(request):
     name = request.POST.get('catName')
     desc = request.POST.get('catDesc')
    
-    if cat_id == -1 :
+    if cat_id == "-1" :
         data = {"name":name, "description":desc, "createDate":strftime("%Y-%m-%d %H:%M:%S", localtime()), "status":0}    
     else:
         data = {"_id":cat_id, "name":name, "description":desc, "createDate":strftime("%Y-%m-%d %H:%M:%S", localtime()), "status":0} 
@@ -254,7 +261,9 @@ def add_category(request):
     print 'add_category.URL ===>', tempUrl
     response = requests.post(tempUrl, json.dumps(data), headers=headers)
     if response.status_code == 200 or response.status_code == 201:
-        if cat_id == -1 :
+        if cat_id == "-1" :
+            data = response.json()
+            print 'category:data ===>', data            
             return list_category(request, "Category added!!!")
         else:
             return list_category(request, "Category edited!!!")
@@ -270,7 +279,7 @@ def remove_category(request):
     global latest_mooc_list, default_mooc, headers, user_dict
    
     name = request.GET.get('id')
-    if name is not -1 :
+    if name is not None and name != "-1" :
         file_str = StringIO()
         file_str.write(user_dict[request.user.username]["url"])
         file_str.write('/category/')
@@ -316,9 +325,8 @@ def list_course(request, msg=''):
     file_str.write('/course/list')
 
     name = request.GET.get('id')
-    if name != -1 :
-        user_dict[request.user.username]["category"]["id"] = name
-        user_dict[request.user.username]["category"]["name"] = request.GET.get('name')
+    if name is not None and name != "-1" :
+        user_dict[request.user.username]["category"] = {"id": name, "name":request.GET.get('name')}
         
         file_str.write("/")
         file_str.write(name)
@@ -389,7 +397,7 @@ def add_course(request):
     data = {} 
     
     course_id = request.POST.get('courseId')
-    if course_id != -1 :
+    if course_id is not None and course_id != "-1" :
         data["_id"] = course_id
     data["category"] = request.POST.get("category")
     data["title"] = request.POST.get("title")
@@ -413,9 +421,9 @@ def add_course(request):
     print 'add_course.URL ===>', tempUrl
     response = requests.post(tempUrl, json.dumps(data), headers=headers)
     if response.status_code == 200 or response.status_code == 201:
-        data = response.json()
-        print 'add_course:data ===>', data
-        if course_id == -1 :
+        res_data = response.json()
+        print 'add_course:data ===>', res_data
+        if course_id == "-1" :
             # Now we need to add course to user object
             file_str = StringIO()
             file_str.write(default_mooc.primary_URL)
@@ -429,7 +437,7 @@ def add_course(request):
                 user_data = user_response.json()
                 print 'add_course.fetch_user:data ===>', user_data
             
-                own_course = user_dict[request.user.username]["mooc"]["name"] + ":" + data["id"]
+                own_course = user_dict[request.user.username]["mooc"]["name"] + ":" + res_data["id"]
                 user_data["own"].append(own_course)
     
                 tempUrl = default_mooc.primary_URL + "/user"
@@ -460,7 +468,7 @@ def remove_course(request):
     global latest_mooc_list, default_mooc, headers, user_dict
    
     name = request.GET.get('id')
-    if name is not -1 :
+    if name is not None and name != "-1" :
         file_str = StringIO()
         file_str.write(user_dict[request.user.username]["url"])
         file_str.write('/course/')

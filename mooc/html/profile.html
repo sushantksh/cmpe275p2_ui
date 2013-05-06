@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
-    <title>Sign Up</title>
+    <title>CMPE 275 Project 2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -11,9 +11,8 @@
     <link href="/assets/css/bootstrap.css" rel="stylesheet">
     <style type="text/css">
       body {
-        padding-top: 40px;
+        padding-top: 60px;
         padding-bottom: 40px;
-        background-color: #f5f5f5;
       }
 
       .form-signin {
@@ -52,64 +51,68 @@
     <!-- Fav and touch icons -->
     <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/assets/ico/apple-touch-icon-144-precomposed.png">
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/assets/ico/apple-touch-icon-114-precomposed.png">
-      <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/assets/ico/apple-touch-icon-72-precomposed.png">
-                    <link rel="apple-touch-icon-precomposed" href="/assets/ico/apple-touch-icon-57-precomposed.png">
-                                   <!-- <link rel="shortcut icon" href="../assets/ico/favicon.png"> -->
-  </head>
-
-  <body>
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="/assets/ico/apple-touch-icon-57-precomposed.png">
+    <link rel="shortcut icon" href="/assets/ico/favicon.png">
+</head>
+<body>
     <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="brand" href="#">Mooc: {{selectedMooc}}</a>
-          <div class="nav-collapse collapse">
-            <ul class="nav">
-              <li><a href="/mooc/home/">Home</a></li>
-              <li><a href="/mooc/list_category/">Categories</a></li>
-              <li><a href="/mooc/list_course/">Courses</a></li>
-              <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">MOOCS<b class="caret"></b></a>
-                {% if latest_mooc_list %}
-                	<ul class="dropdown-menu">
-				    {% for mooc in latest_mooc_list %}
-        				<li><a href="/mooc/home/?id={{ mooc.id }}/">{{ mooc.group }}</a></li>
-    				{% endfor %}
-    				</ul>
-				{% else %}
-    				<p>No moocs registered.</p>
-				{% endif %}
-              </li>
-              <li style="width:200px;padding-left:100px;padding-top:8px"><font color="white"><b>Welcome {{ fName }} {{ lName }} !</b></font></li>
-              <li class="active"><a href="#">Profile</a></li>
-              <li><a href="/mooc/logout/">Logout</a></li>
-            </ul>
-          </div><!--/.nav-collapse -->
-        </div>
-      </div>
-    </div>
-
+        <div class="navbar-inner">
+            <div class="container">
+                <!--
+                <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                -->
+                <a class="brand" href="#">Mooc: {{selectedMooc}}</a>
+                <div class="nav-collapse collapse">
+                    <ul class="nav">
+                        <li><a href="/mooc/home/">Home</a></li>
+                        <li><a href="/mooc/list_category/">Categories</a></li>
+                        <li><a href="/mooc/list_course/">Courses</a></li>
+                        <li class="dropdown">
+                            {% if latest_mooc_list %}
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">MOOCS<b class="caret"></b></a>
+                                    <ul class="dropdown-menu">
+                                {% for mooc in latest_mooc_list %}
+                                            <li><a href="/mooc/home/?id={{ mooc.id }}/">{{ mooc.group }}</a></li>
+            				{% endfor %}
+                                    </ul>
+                            {% else %}
+                                <p>No moocs registered.</p>
+                            {% endif %}
+                        </li>
+                        <li style="padding-left:150px"><font color="white"><b>Welcome {{ fName }} {{ lName }} !</b></font></li>
+                        <li class="active"><a href="#">Profile</a></li>
+                        <li><a href="/mooc/logout/">Logout</a></li>
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div><!--/.container -->
+        </div><!--/.navbar-inner -->
+    </div><!--/.navbar -->
     <div class="container">
-      <div class=row>
-	      <form name="MyForm" class="form-signin" action="/mooc/update_user/" method="post">
-	      	<h5>{{message}}</h5>
-	      	<h3 class="form-signin-heading">User Profile</h3>
-	        <b><label class="control-label" for="password">{{email}}</label></b>
-	        <input type="password" class="input-block-level" placeholder="New Password" name="password">
-	        <input type="text" class="input-block-level" placeholder="First Name" name="firstname" value="{{fName}}">
-	        <input type="text" class="input-block-level" placeholder="Last Name" name="lastname" value="{{lName}}">
-	        <button class="btn btn-large btn-primary" type="submit">Submit</button>
-	      </form>
-	      </div>
-      <hr>
-      <footer>
-        <p>&copy; Annonymous Group 2013</p>
-      </footer>
-    </div>
+        <div class="row">
+            {% if message %}
+                <span class="label label-important">{{message}}</span>
+            {% endif %}
+        </div>
+        <div class=row>
+	      <form name="MyForm" class="form-signin" action="/mooc/update_user/" method="POST">
+                <h2 class="form-signin-heading">User Profile</h2>
+                <b><label class="control-label" for="password">{{email}}</label></b>
+                <input type="password" class="input-block-level" placeholder="New Password" name="password">
+                <input type="text" class="input-block-level" placeholder="First Name" name="firstname" value="{{fName}}">
+                <input type="text" class="input-block-level" placeholder="Last Name" name="lastname" value="{{lName}}">
+                <button class="btn btn-large btn-primary" type="submit">Save</button>
+            </form>
+        </div>
+        <hr>
+        <footer>
+            <p>&copy; Annonymous Group 2013</p>
+        </footer>
+    </div> <!-- /container -->
 
     <!-- Le javascript
     ================================================== -->

@@ -70,7 +70,7 @@
 
     <div class="container">
         <div class="row">
-            <a href="/mooc/category/"><button class="btn" type="button"><b class="icon-plus-sign"></b>Add Category</button></a>
+            <a href="/mooc/category/"><button class="btn" type="button"><b class="icon-plus-sign"></b> Add Category</button></a>
             {% if message %}
                 <span class="label label-important">{{message}}</span>
             {% endif %}
@@ -88,9 +88,9 @@
                 {% for category in category_list %}
                     <tr>
              		<td>{{forloop.counter}}</td>
-                		<td><a href="/mooc/list_course/?id={{category.id}}">{{category.name}}</a></td>
-                		<td><a href="/mooc/category/?id={{category.id}}&name={{category.name}}"><button class="btn btn-mini" type="button"><i class="icon-pencil"></i> Edit</button></a>
-                    		&nbsp;&nbsp;<a href="/mooc/remove_category/?id={{category.id}}"><button class="btn btn-mini" type="button"><i class="icon-remove-sign"></i></button></a>
+                		<td><a href="/mooc/list_course/?id={{category.id}}&name={{category.name}}">{{category.name}}</a></td>
+                		<td><a href="/mooc/category/?id={{category.id}}"><button class="btn btn-mini" type="button"><i class="icon-pencil"></i> Edit</button></a>
+                    		&nbsp;&nbsp;<a href="/mooc/remove_category/?id={{category.id}}"><button class="btn btn-mini" type="button"><i class="icon-remove-sign"></i> Delete</button></a>
                 		</td>
                 	   </tr>
         	   {% endfor %}      
