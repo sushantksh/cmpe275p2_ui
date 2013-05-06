@@ -8,7 +8,7 @@
     <meta name="author" content="">
 
     <!-- Le styles -->
-    <link href="../assets/css/bootstrap.css" rel="stylesheet">
+    <link href="/assets/css/bootstrap.css" rel="stylesheet">
     <style type="text/css">
       body {
         padding-top: 40px;
@@ -42,64 +42,106 @@
       }
 
     </style>
-    <link href="../assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/assets/css/bootstrap-responsive.css" rel="stylesheet">
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
-      <script src="../assets/js/html5shiv.js"></script>
+      <script src="/assets/js/html5shiv.js"></script>
     <![endif]-->
 
     <!-- Fav and touch icons -->
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
-      <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
-                    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
-                                   <!-- <link rel="shortcut icon" href="../assets/ico/favicon.png"> -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/assets/ico/apple-touch-icon-114-precomposed.png">
+      <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/assets/ico/apple-touch-icon-72-precomposed.png">
+                    <link rel="apple-touch-icon-precomposed" href="/assets/ico/apple-touch-icon-57-precomposed.png">
+                                   <!-- <link rel="shortcut icon" href="/assets/ico/favicon.png"> -->
   </head>
 
   <body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="#">Mooc: {{selectedMooc}}</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a href="/mooc/home/">Home</a></li>
+              <li class="active"><a href="/mooc/list_category/">Categories</a></li>
+              <li><a href="/mooc/list_course/">Courses</a></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">MOOCS<b class="caret"></b></a>
+                {% if latest_mooc_list %}
+                	<ul class="dropdown-menu">
+				    {% for mooc in latest_mooc_list %}
+        				<li><a href="/mooc/home/?id={{ mooc.id }}/">{{ mooc.group }}</a></li>
+    				{% endfor %}
+    				</ul>
+				{% else %}
+    				<p>No moocs registered.</p>
+				{% endif %}
+              </li>
+              <li style="width:200px;padding-left:100px;padding-top:8px"><font color="white"><b>Welcome {{ fName }} {{ lName }} !</b></font></li>
+              <li><a href="/mooc/profile/">Profile</a></li>
+              <li><a href="/mooc/logout/">Logout</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
 
     <div class="container">
-
-      <form class="form-signin" method="post" action="/add_course">
-        <h2 class="form-signin-heading">Add Course</h2>
-	    <label class="control-label" for="textarea">Course Title</label>  
-        <input type="text" class="input-block-level" placeholder="Course Title" id="title">
-	    <label class="control-label" for="textarea">Course Category</label>  
-        <input type="text" class="input-block-level" placeholder="Course Category" id="category">
-	    <label class="control-label" for="textarea">Section</label>  
-        <input type="text" class="input-block-level" placeholder="Section" id="section">
-	    <label class="control-label" for="textarea">Dept</label>  
-        <input type="text" class="input-block-level" placeholder="Course Title" id="dept">
-	    <label class="control-label" for="textarea">Term</label>  
-        <input type="text" class="input-block-level" placeholder="Course Title" id="term">
-	    <label class="control-label" for="textarea">Instructor</label>  
-        <input type="text" class="input-block-level" placeholder="Course Title" id="instructor">
-	    <label class="control-label" for="textarea">Day</label>  
-        <input type="text" class="input-block-level" placeholder="Course Title" id="day">
-	    <label class="control-label" for="textarea">File Store</label>  
-        <input type="text" class="input-block-level" placeholder="Course Title" id="attachment">
-        <button class="btn btn-large btn-primary" type="submit">Add Course</button>
-      </form>
-
+      <div class=row>
+	      <form name="CourseForm" class="form-signin" action="/mooc/add_course/" method="POST">
+	        <h5>{{ message }}</h5>
+	        <h2 class="form-signin-heading">Course</h2>
+		    <input type="hidden" name="catId" value="{{id}}">
+		    <label class="control-label" for="textarea">Course Title</label>  
+	        <input type="text" class="input-block-level" placeholder="Course Title" name="title" value="{{title}}">
+		    <label class="control-label" for="textarea">Course Category</label>  
+	        <input type="text" class="input-block-level" placeholder="Course Category" name="category" value="{{category}}">
+		    <label class="control-label" for="textarea">Section</label>  
+	        <input type="text" class="input-block-level" placeholder="Section" name="section" value="{{section}}">
+		    <label class="control-label" for="textarea">Dept</label>  
+	        <input type="text" class="input-block-level" placeholder="Course Dept" name="dept" value="{{dept}}">
+		    <label class="control-label" for="textarea">Term</label>  
+        	<input type="text" class="input-block-level" placeholder="Course Term" name="term" value="{{term}}">
+		    <label class="control-label" for="textarea">Instructor</label>  
+	        <input type="text" class="input-block-level" placeholder="Course Instructor" name="instructor" value="{{instructor}}">
+		    <label class="control-label" for="textarea">Day</label>  
+	        <input type="text" class="input-block-level" placeholder="Course Days" name="days" value="{{days}}">
+		    <label class="control-label" for="textarea">Description</label>  
+	        <input type="text" class="input-block-level" placeholder="Course Description" name="Description" value="{{Description}}">
+		    <label class="control-label" for="textarea">File Store</label>  
+    	    <input type="text" class="input-block-level" placeholder="Course Attachment" name="attachment" value="{{attachment}}">
+        	<button class="btn btn-large btn-primary" type="submit">Add Course</button>
+	      </form>
+	      </div>
+      <hr>
+      <footer>
+        <p>&copy; Annonymous Group 2013</p>
+      </footer>
     </div> <!-- /container -->
 
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="../assets/js/jquery.js"></script>
-    <script src="../assets/js/bootstrap-transition.js"></script>
-    <script src="../assets/js/bootstrap-alert.js"></script>
-    <script src="../assets/js/bootstrap-modal.js"></script>
-    <script src="../assets/js/bootstrap-dropdown.js"></script>
-    <script src="../assets/js/bootstrap-scrollspy.js"></script>
-    <script src="../assets/js/bootstrap-tab.js"></script>
-    <script src="../assets/js/bootstrap-tooltip.js"></script>
-    <script src="../assets/js/bootstrap-popover.js"></script>
-    <script src="../assets/js/bootstrap-button.js"></script>
-    <script src="../assets/js/bootstrap-collapse.js"></script>
-    <script src="../assets/js/bootstrap-carousel.js"></script>
-    <script src="../assets/js/bootstrap-typeahead.js"></script>
+    <script src="/assets/js/jquery.js"></script>
+    <script src="/assets/js/bootstrap-transition.js"></script>
+    <script src="/assets/js/bootstrap-alert.js"></script>
+    <script src="/assets/js/bootstrap-modal.js"></script>
+    <script src="/assets/js/bootstrap-dropdown.js"></script>
+    <script src="/assets/js/bootstrap-scrollspy.js"></script>
+    <script src="/assets/js/bootstrap-tab.js"></script>
+    <script src="/assets/js/bootstrap-tooltip.js"></script>
+    <script src="/assets/js/bootstrap-popover.js"></script>
+    <script src="/assets/js/bootstrap-button.js"></script>
+    <script src="/assets/js/bootstrap-collapse.js"></script>
+    <script src="/assets/js/bootstrap-carousel.js"></script>
+    <script src="/assets/js/bootstrap-typeahead.js"></script>
 
   </body>
 </html>

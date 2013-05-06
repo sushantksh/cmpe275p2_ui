@@ -22,12 +22,11 @@ urlpatterns = patterns('',
     url(r'^enroll/$', views.enroll_user),
 
     
+    url(r'^list_course/$', views.list_course),
+    url(r'^course/$', views.course),
     url(r'^add_course/$', views.add_course),
     url(r'^get_course/$', views.get_course),
-    url(r'^list_course/$', views.list_course),
-    url(r'^update_course/$', views.update_course),
     url(r'^remove_course/$', views.remove_course),
-
 
 
     url(r'^add_announcement/$', views.add_announcement),

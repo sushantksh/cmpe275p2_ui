@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>CMPE 275 Project 2</title>
+    <title>Add Course</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -11,9 +11,36 @@
     <link href="/assets/css/bootstrap.css" rel="stylesheet">
     <style type="text/css">
       body {
-        padding-top: 60px;
+        padding-top: 40px;
         padding-bottom: 40px;
+        background-color: #f5f5f5;
       }
+
+      .form-signin {
+        max-width: 300px;
+        padding: 19px 29px 29px;
+        margin: 0 auto 20px;
+        background-color: #fff;
+        border: 1px solid #e5e5e5;
+        -webkit-border-radius: 5px;
+           -moz-border-radius: 5px;
+                border-radius: 5px;
+        -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+           -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+                box-shadow: 0 1px 2px rgba(0,0,0,.05);
+      }
+      .form-signin .form-signin-heading,
+      .form-signin .checkbox {
+        margin-bottom: 10px;
+      }
+      .form-signin input[type="text"],
+      .form-signin input[type="password"] {
+        font-size: 16px;
+        height: auto;
+        margin-bottom: 15px;
+        padding: 7px 9px;
+      }
+
     </style>
     <link href="/assets/css/bootstrap-responsive.css" rel="stylesheet">
 
@@ -27,11 +54,10 @@
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/assets/ico/apple-touch-icon-114-precomposed.png">
       <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/assets/ico/apple-touch-icon-72-precomposed.png">
                     <link rel="apple-touch-icon-precomposed" href="/assets/ico/apple-touch-icon-57-precomposed.png">
-                                   <link rel="shortcut icon" href="/assets/ico/favicon.png">
+                                   <!-- <link rel="shortcut icon" href="/assets/ico/favicon.png"> -->
   </head>
 
-  <body>
-
+<body>
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
@@ -43,9 +69,9 @@
           <a class="brand" href="#">Mooc: {{selectedMooc}}</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
-              <li><a href="/mooc/home/">Home</a></li>
-              <li><a href="/mooc/list_category">Categories</a></li>
-              <li class="active"><a href="#">Courses</a></li>
+              <li class="active"><a href="#">Home</a></li>
+              <li><a href="/mooc/list_category/">Categories</a></li>
+              <li><a href="/mooc/list_course/">Courses</a></li>
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">MOOCS<b class="caret"></b></a>
                 {% if latest_mooc_list %}
@@ -66,39 +92,36 @@
         </div>
       </div>
     </div>
-
+    
     <div class="container">
-
-      <!-- Main hero unit for a primary marketing message or call to action -->
-      <div class="row">
-        <a href="/mooc/course/"><button class="btn btn-primary" type="button">Add Course</button></a>
-      </div>
       <div class=row>
-      <h5>{{message}}</h5>
-      <table class="table table-bordered">
-      <tr>
-      	<th style="width: 2%;">No.</th>
-      	<th style="width: 60%;">Course</th>
-      	<th style="width: 38%;">Action</th>
-      </tr>
-        {% for course in course_list %}
-        <tr>
- 		<td>{{forloop.counter}}</td>
-		<td><a href="/mooc/get_course/?id={{course.id}}">{{course.title}}</a></td>
-		<td><a href="/mooc/course/?id={{course.title}}"><button class="btn" type="button">Edit</button></a>
-		&nbsp;&nbsp;<a href="/mooc/enroll_course/?id={{course.id}}"><button class="btn" type="button">Enroll</button></a>
-		&nbsp;&nbsp;&nbsp;<a href="/mooc/remove_course/?id={{course.id}}"><button class="btn" type="button">Remove</button></a>
-		</td>
-		</tr>
-		{% endfor %}      
-	  </table>
+        <h2 class="form-signin-heading">View Course</h2>
+	    <label class="control-label" for="label">ID</label>
+	    <label class="control-label">{{id}}</label> 
+	    <label class="control-label" for="label">Title</label>
+	    <label class="control-label">{{title}}</label> 
+	    <label class="control-label" for="label">Category</label>
+	    <label class="control-label">{{category}}</label> 
+	    <label class="control-label" for="label">Dept</label>
+	    <label class="control-label">{{dept}}</label> 
+	    <label class="control-label" for="label">Section</label>
+	    <label class="control-label">{{section}}</label> 
+	    <label class="control-label" for="label">Term</label>
+	    <label class="control-label">{{term}}</label> 
+	    <label class="control-label" for="label">Instructor</label>
+	    <label class="control-label">{{instructor}}</label> 
+	    <label class="control-label" for="label">Days</label>
+	    <label class="control-label">{{days}}</label> 
+	    <label class="control-label" for="label">Description</label>
+	    <label class="control-label">{{desc}}</label> 
+	    <label class="control-label" for="label">Attachment</label>
+	    <label class="control-label">{{attachment}}</label> 
       </div>
       <hr>
       <footer>
         <p>&copy; Annonymous Group 2013</p>
       </footer>
-
-    </div> <!-- /container -->
+    </div>    
 
     <!-- Le javascript
     ================================================== -->

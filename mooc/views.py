@@ -2,9 +2,7 @@
 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.core.context_processors import csrf
 from django.contrib.auth import authenticate, login, logout
-#from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from mooc.models import MOOC
 from time import localtime, strftime
@@ -70,7 +68,7 @@ def add_user(request):
       return render_to_response("signup.html", ctx)
      
    payload = {"_id":email, "own":[], "enrolled":[], "quizzes":[]} 
-   response = requests.post(url + "user", data=json.dumps(payload), headers=headers)
+   response = requests.post(url + "/user", data=json.dumps(payload), headers=headers)
    if response.status_code == 200 or response.status_code == 201:
       ctx = {"message" : "User successfully registered, please login to continue."}
       return render_to_response("login.html",ctx,context_instance=RequestContext(request))
@@ -199,10 +197,10 @@ def add_category(request):
    tempUrl = file_str.getvalue()
    response = requests.post(tempUrl, json.dumps(payload), headers=headers)
    if response.status_code == 200 or response.status_code == 201:
-       if cat_id == -1 :
-           return list_category(request, "Category added!!!")
-       else:
-           return list_category(request, "Category edited!!!")
+      if cat_id == -1 :
+         return list_category(request, "Category added!!!")
+      else:
+         return list_category(request, "Category edited!!!")
    else:
       ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "id":cat_id, "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group, "message":"Failed to add Category" }
       return render_to_response("addCategory.html",ctx)
@@ -259,34 +257,113 @@ def enroll_user(request):
 #
 # Course
 #
-#@login_required(login_url='login') -- > Good to have, need to figure out usage.
+def list_course(request, msg=''):
+   global url, course, lst, latest_mooc_list, selected_mooc
+   
+   file_str = StringIO()
+   file_str.write(url)
+   file_str.write('/course/list')
+
+   tempUrl = file_str.getvalue()
+   print 'URL-->', tempUrl
+   response = requests.get(tempUrl)
+   data = response.json()
+   print '--->course:data=', data
+   ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "course_list":data["list"], "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group, "message":msg }
+   return render_to_response("courses.html",ctx)
+
+def course(request):
+   global latest_mooc_list, selected_mooc
+   
+   name = request.GET.get('id')
+   if name is not None:
+      file_str = StringIO()
+      file_str.write(url)
+      file_str.write('/course/')
+      file_str.write(name)
+      
+      tempUrl = file_str.getvalue()
+      print 'URL-->', tempUrl       
+      response = requests.get(tempUrl)
+      if response.status_code == 200:
+         data = response.json()
+         print '--->Course:data=', data
+         ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group, "id":data["id"], "title": data["title"],"category" : data["category"], "dept":data["dept"], "section" : data["section"] , "term" : data["term"], "instructor" : data["instructor"] , "days" : data["days"], "Description" :data["Description"], "attachment" :data["attachment"]}
+         return render_to_response("addCourse.html",ctx)
+      
+   ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "id":"-1", "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group}
+   return render_to_response("addCourse.html",ctx)
+
 def add_course(request):
-   global url, headers, course
-   payload = {"_id":"course1","category":"annonymous_1","title":"introduction to algebra","section":2,"dept":"eng","term":"Spring","year":2013,"instructor":[{"name":"russel Doe","id":29}],"days":["Monday","Wednesday","Friday"],"hours":["8:00AM","9:15:AM"],"Description":"My course","attachment":"PATH","version":"1"}
-   response = requests.post(url + course, data=json.dumps(payload), headers=headers)
-   print response.text
+   global url, headers, latest_mooc_list, selected_mooc
+   data = {} 
+   data["couId"]         = request.POST.get('couId')
+   data["category"]      = request.POST.get("category")
+   data["title"]         = request.POST.get("title")
+   data["dept"]          = request.POST.get("dept")
+   data["section"]       = request.POST.get("section")
+   data["term"]          = request.POST.get("term")
+   data["instructor"]    = request.POST.get("instructor")
+   data["days"]          = request.POST.get("days")
+   data["Description"]   = request.POST.get("Description")
+   data["attachment"]    = request.POST.get("attachment")
+
+   payload = {"title": data["title"], "category" : data["category"] , "dept" :data["dept"], "section" : data["section"] , "term" : data["term"], "instructor" : data["instructor"] , "days" : [data["days"]], "hours":["8:00AM","9:15:AM"],"Description" :data["Description"], "attachment" :data["attachment"], "version": "1"}
+   
+   print '--->add_course:data=', payload
+   file_str = StringIO()
+   file_str.write(url)
+   file_str.write('/course')
+   file_str.write('?email=')   # Need to do the same for category
+   file_str.write(request.user.username)
+
+   tempUrl = file_str.getvalue()
+   response = requests.post(tempUrl, json.dumps(payload), headers=headers)
+   if response.status_code == 200 or response.status_code == 201:
+      if data["couId"] == -1 :
+         return list_course(request, "Course added!!!")
+      else:
+         return list_course(request, "Course edited!!!")
+   else:
+      ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "id":data["couId"], "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group, "message":"Failed to add Course" }
+      return render_to_response("addCourse.html",ctx)
    
 def get_course(request):
-   global url, headers, course
-   response = requests.get(url + course +"/course1")
-   print response.json()
+   global url, latest_mooc_list, selected_mooc
    
-def list_course(request):
-   global url, headers, course, lst
-   requests.get(url + course + lst)
-#   print response.json()
-   return render_to_response("courses.html") 
+   name = request.GET.get('id')
+   if name is not -1 :
+      file_str = StringIO()
+      file_str.write(url)
+      file_str.write('/course/')
+      file_str.write(name)
+   
+      tempUrl = file_str.getvalue()
+      response = requests.get(tempUrl)
+      if response.status_code == 200:
+         data = response.json()
+         print '--->get_course:data=', data
+         ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group, "title": data["title"], "dept":data["dept"], "section" : data["section"] , "term" : data["term"], "instructor" : data["instructor"] , "days" : data["days"], "Description" :data["Description"], "attachment" :data["attachment"] }
+         return render_to_response("viewCourse.html",ctx)
 
-def remove_course():
-   global url, headers, course
-   response = requests.get(url + course +"/course1")
-   print response.text
+   return list_course(request, "Failed to get course!!")
+   
+def remove_course(request):
+   global url, headers, latest_mooc_list, selected_mooc
+   
+   name = request.GET.get('id')
+   if name is not -1 :
+      file_str = StringIO()
+      file_str.write(url)
+      file_str.write('/course/')
+      file_str.write(name)
+      
+      tempUrl = file_str.getvalue()
+      response = requests.delete(tempUrl)
+      if response.status_code == 200:
+         return list_course(request, "Course removed!!!")
 
-def update_course():
-   global url, headers, course
-   payload = {"_id":"course1","category":"annonymous_1","title":"machine learning","section":2,"dept":"eng","term":"Spring","year":2013,"instructor":[{"name":"russel Doe","id":29}],"days":["Monday","Wednesday","Friday"],"hours":["8:00AM","9:15:AM"],"Description":"My course","attachment":"PATH","version":"1"}
-   response = requests.put(url + course, data=json.dumps(payload), headers=headers)
-   print response.text
+   return list_course(request, "Failed to remove course!!")
 
 #
 # announcement
