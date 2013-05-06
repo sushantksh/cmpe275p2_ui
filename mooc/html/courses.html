@@ -74,11 +74,19 @@
 
     <div class="container">
         <div class="row">
+            <select name="courseCategory">
+                <option value="-1">All</option>
+                {% for catItem in category_list %}
+                    {% if catItem.id == category %}
+                        <option value="{{catItem.id}}" selected>{{catItem.name}}</option>
+                    {% else %}
+                        <option value="{{catItem.id}}">{{catItem.name}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <a href="/mooc/list_category/"><button class="btn" type="button"><b class="icon-filter"></b> Filter</button></a>
+            &nbsp;&nbsp;
             <a href="/mooc/course/"><button class="btn" type="button"><b class="icon-plus-sign"></b> Add Course</button></a>
-            {% if category %}
-                <h5>Category: {{category_name}}</h5>
-            {% endif %}
-
             {% if message %}
                 <span class="label label-important">{{message}}</span>
             {% endif %}

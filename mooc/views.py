@@ -324,9 +324,19 @@ def list_course(request, msg=''):
     file_str.write(user_dict[request.user.username]["url"])
     file_str.write('/course/list')
 
-    name = request.GET.get('id')
+    name = request.GET.get('courseCategory')
     if name is not None and name != "-1" :
-        user_dict[request.user.username]["category"] = {"id": name, "name":request.GET.get('name')}
+        file_str_cat = StringIO()
+        file_str_cat.write(user_dict[request.user.username]["url"])
+        file_str_cat.write('/category/')
+        file_str_cat.write(name)        
+        
+        tempUrl = file_str_cat.getvalue()
+        print 'list_course.URL ===>', tempUrl
+        response = requests.get(tempUrl)
+        if response.status_code == 200:
+            data = response.json()
+            user_dict[request.user.username]["category"] = {"id": name, "name":data["'name"]}
         
         file_str.write("/")
         file_str.write(name)
@@ -338,6 +348,19 @@ def list_course(request, msg=''):
         data = response.json()
         print 'category_course:data ===>', data
         ctx["course_list"] = data["list"]
+
+    ctx["category_list"] = []
+    file_str = StringIO()
+    file_str.write(user_dict[request.user.username]["url"])
+    file_str.write('/category/list')
+    
+    tempUrl = file_str.getvalue()
+    print 'course.list_category.URL ===>', tempUrl
+    response = requests.get(tempUrl)
+    if response.status_code == 200:
+        data = response.json()
+        print 'list_category:data ===>', data
+        ctx["category_list"] = data["list"] 
         
 #    build list of courses enrolled and owned for this mooc
     fetch_user(request, ctx)
