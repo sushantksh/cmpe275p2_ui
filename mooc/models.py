@@ -10,12 +10,3 @@ class MOOC(models.Model):
     # Python 3: def __str__(self):     
     def __unicode__(self):  
        return self.group
-    
-    def get_primary_url(self):
-        return self.primary_URL
-        
-    def get_secondary_url(self):
-        return self.secondary_URL
-
-	def is_default_group(self):
-	    return self.is_default

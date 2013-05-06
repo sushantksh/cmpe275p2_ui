@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <title>CMPE 275 Project 2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,78 +25,82 @@
     <!-- Fav and touch icons -->
     <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/assets/ico/apple-touch-icon-144-precomposed.png">
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/assets/ico/apple-touch-icon-114-precomposed.png">
-      <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/assets/ico/apple-touch-icon-72-precomposed.png">
-                    <link rel="apple-touch-icon-precomposed" href="/assets/ico/apple-touch-icon-57-precomposed.png">
-                                   <link rel="shortcut icon" href="/assets/ico/favicon.png">
-  </head>
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="/assets/ico/apple-touch-icon-57-precomposed.png">
+    <link rel="shortcut icon" href="/assets/ico/favicon.png">
+</head>
 
-  <body>
-
+<body>
     <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="brand" href="#">Mooc: {{selectedMooc}}</a>
-          <div class="nav-collapse collapse">
-            <ul class="nav">
-              <li><a href="/mooc/home/">Home</a></li>
-              <li class="active"><a href="#">Categories</a></li>
-              <li><a href="/mooc/list_course/">Courses</a></li>
-              <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">MOOCS<b class="caret"></b></a>
-                {% if latest_mooc_list %}
-                	<ul class="dropdown-menu">
-				    {% for mooc in latest_mooc_list %}
-        				<li><a href="/mooc/home/?id={{ mooc.id }}/">{{ mooc.group }}</a></li>
-    				{% endfor %}
-    				</ul>
-				{% else %}
-    				<p>No moocs registered.</p>
-				{% endif %}
-              </li>
-              <li style="width:200px;padding-left:100px;padding-top:8px"><font color="white"><b>Welcome {{ fName }} {{ lName }} !</b></font></li>
-              <li><a href="/mooc/profile/">Profile</a></li>
-              <li><a href="/mooc/logout/">Logout</a></li>
-            </ul>
-          </div><!--/.nav-collapse -->
-        </div>
-      </div>
-    </div>
+        <div class="navbar-inner">
+            <div class="container">
+                <!--
+                <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                -->
+                <a class="brand" href="#">Mooc: {{selectedMooc}}</a>
+                <div class="nav-collapse collapse">
+                    <ul class="nav">
+                        <li><a href="/mooc/home/">Home</a></li>
+                        <li class="active"><a href="#">Categories</a></li>
+                        <li><a href="/mooc/list_course/">Courses</a></li>
+                        <li class="dropdown">
+                            {% if latest_mooc_list %}
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">MOOCS<b class="caret"></b></a>
+                                    <ul class="dropdown-menu">
+                                {% for mooc in latest_mooc_list %}
+                                            <li><a href="/mooc/home/?id={{ mooc.id }}/">{{ mooc.group }}</a></li>
+            				{% endfor %}
+                                    </ul>
+                            {% else %}
+                                <p>No moocs registered.</p>
+                            {% endif %}
+                        </li>
+                        <li style="padding-left:150px"><font color="white"><b>Welcome {{ fName }} {{ lName }} !</b></font></li>
+                        <li><a href="/mooc/profile/">Profile</a></li>
+                        <li><a href="/mooc/logout/">Logout</a></li>
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div><!--/.container -->
+        </div><!--/.navbar-inner -->
+    </div><!--/.navbar -->
 
     <div class="container">
-
-      <!-- Main hero unit for a primary marketing message or call to action -->
-      <div class="row">
-        <a href="/mooc/category/"><button class="btn btn-primary" type="button">Add Category</button></a>
-      </div>
-      <div class=row>
-      <h5>{{message}}</h5>
-      <table class="table table-bordered">
-      <tr>
-      	<th style="width: 2%;">No.</th>
-      	<th style="width: 80%;">Category</th>
-      	<th style="width: 18%;">Action</th>
-      </tr>
-        {% for category in category_list %}
-        <tr>
- 		<td>{{forloop.counter}}</td>
-		<td><a href="/mooc/get_category/?id={{category.id}}">{{category.name}}</a></td>
-		<td><a href="/mooc/category/?id={{category.id}}"><button class="btn" type="button">Edit</button></a>
-		&nbsp;&nbsp;<a href="/mooc/remove_category/?id={{category.id}}"><button class="btn" type="button">Remove</button></a>
-		</td>
-		</tr>
-		{% endfor %}      
-	  </table>
-      </div>
-      <hr>
-      <footer>
-        <p>&copy; Annonymous Group 2013</p>
-      </footer>
-
+        <div class="row">
+            <a href="/mooc/category/"><button class="btn" type="button"><b class="icon-plus-sign"></b>Add Category</button></a>
+            {% if message %}
+                <span class="label label-important">{{message}}</span>
+            {% endif %}
+        </div>
+        <div class=row>
+            <table class="table table-bordered table-striped table-hover">
+                <thead>
+                    <tr>
+                      	<th style="width: 2%;">No.</th>
+                      	<th style="width: 80%;">Category</th>
+                      	<th style="width: 18%;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for category in category_list %}
+                    <tr>
+             		<td>{{forloop.counter}}</td>
+                		<td><a href="/mooc/category/courses/?id={{category.id}}">{{category.name}}</a></td>
+                		<td><a href="/mooc/category/?id={{category.id}}"><button class="btn btn-mini" type="button"><i class="icon-pencil"></i> Edit</button></a>
+                    		&nbsp;&nbsp;<a href="/mooc/remove_category/?id={{category.id}}"><button class="btn btn-mini" type="button"><i class="icon-remove-sign"></i></button></a>
+                		</td>
+                	   </tr>
+        	   {% endfor %}      
+                </tbody>
+        	 </table>
+        </div>
+        <hr>
+        <footer>
+            <p>&copy; Annonymous Group 2013</p>
+        </footer>
     </div> <!-- /container -->
 
     <!-- Le javascript
@@ -115,6 +119,5 @@
     <script src="/assets/js/bootstrap-collapse.js"></script>
     <script src="/assets/js/bootstrap-carousel.js"></script>
     <script src="/assets/js/bootstrap-typeahead.js"></script>
-
-  </body>
+</body>
 </html>

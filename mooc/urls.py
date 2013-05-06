@@ -3,30 +3,34 @@ from django.conf.urls import patterns, url
 from mooc import views
 
 urlpatterns = patterns('',
+#    top related views
     url(r'^$', views.index, name='index'),
     url(r'^signup/$', views.signup), #Only Takes care of Loading the Sign Up HTML Page.
     url(r'^add_user/$', views.add_user), # Handles User Sign Up Form.
     url(r'^login/$', views.login_user, name='signin'),
     url(r'^home/$', views.home),
-    
+#    user related views
     url(r'^profile/$', views.profile),
     url(r'^update_user/$', views.update_user),
     url(r'^logout/$', views.logout_user),
-    
+#    category related views
     url(r'^list_category/$', views.list_category),
     url(r'^category/$', views.category),
     url(r'^add_category/$', views.add_category),
-    url(r'^get_category/$', views.get_category),
     url(r'^remove_category/$', views.remove_category),
-    
-    url(r'^enroll/$', views.enroll_user),
+#    course related views
+    url(r'^category/courses/$', views.get_category),
 
-    
     url(r'^add_course/$', views.add_course),
     url(r'^get_course/$', views.get_course),
     url(r'^list_course/$', views.list_course),
     url(r'^update_course/$', views.update_course),
     url(r'^remove_course/$', views.remove_course),
+    
+    url(r'^enroll/$', views.enroll_user),
+
+    
+
 
 
 

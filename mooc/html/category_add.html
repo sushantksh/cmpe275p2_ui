@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="utf-8">
     <title>CMPE 275 Project 2</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,6 +14,32 @@
         padding-top: 60px;
         padding-bottom: 40px;
       }
+
+      .form-signin {
+        max-width: 300px;
+        padding: 19px 29px 29px;
+        margin: 0 auto 20px;
+        background-color: #fff;
+        border: 1px solid #e5e5e5;
+        -webkit-border-radius: 5px;
+           -moz-border-radius: 5px;
+                border-radius: 5px;
+        -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+           -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+                box-shadow: 0 1px 2px rgba(0,0,0,.05);
+      }
+      .form-signin .form-signin-heading,
+      .form-signin .checkbox {
+        margin-bottom: 10px;
+      }
+      .form-signin input[type="text"],
+      .form-signin input[type="password"] {
+        font-size: 16px;
+        height: auto;
+        margin-bottom: 15px;
+        padding: 7px 9px;
+      }
+
     </style>
     <link href="/assets/css/bootstrap-responsive.css" rel="stylesheet">
 
@@ -29,7 +55,6 @@
     <link rel="apple-touch-icon-precomposed" href="/assets/ico/apple-touch-icon-57-precomposed.png">
     <link rel="shortcut icon" href="/assets/ico/favicon.png">
 </head>
-
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
@@ -45,12 +70,8 @@
                 <div class="nav-collapse collapse">
                     <ul class="nav">
                         <li><a href="/mooc/home/">Home</a></li>
-                        <li><a href="/mooc/list_category/">Categories</a></li>
-                        {% if category %}
-                            <li class="active"><a href="/mooc/list_course/">Courses</a></li>                            
-                        {% else %}
-                            <li class="active"><a href="#">Courses</a></li>
-                        {% endif %}
+                        <li class="active"><a href="/mooc/list_category/">Categories</a></li>
+                        <li><a href="/mooc/list_course/">Courses</a></li>
                         <li class="dropdown">
                             {% if latest_mooc_list %}
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">MOOCS<b class="caret"></b></a>
@@ -74,36 +95,19 @@
 
     <div class="container">
         <div class="row">
-            <a href="/mooc/course/"><button class="btn" type="button"><b class="icon-plus-sign"></b>Add Course</button></a>
-            {% if category %}
-                <h5>Category: {{category}}</h5>
-            {% endif %}
-
             {% if message %}
                 <span class="label label-important">{{message}}</span>
             {% endif %}
         </div>
         <div class=row>
-            <table class="table table-bordered table-striped table-hover">
-                <thead>
-                    <tr>
-                      	<th style="width: 2%;">No.</th>
-                      	<th style="width: 80%;">Title</th>
-                      	<th style="width: 18%;">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for course in course_list %}
-                    <tr>
-             		<td>{{forloop.counter}}</td>
-                		<td><a href="/mooc/get_course/?id={{course.id}}">{{course.name}}</a></td>
-                		<td><a href="/mooc/course/?id={{course.id}}"><button class="btn btn-mini" type="button"><i class="icon-pencil"></i> Edit</button></a>
-                    		&nbsp;&nbsp;<a href="/mooc/remove_course/?id={{course.id}}"><button class="btn btn-mini" type="button"><i class="icon-remove-sign"></i></button></a>
-                		</td>
-                	   </tr>
-        	   {% endfor %}      
-                </tbody>
-        	 </table>
+	      <form name="CategoryForm" class="form-signin" action="/mooc/add_category/" method="POST">
+                <h2 class="form-signin-heading">Category</h2>
+                <label class="control-label" for="textarea">Name</label>  
+                <input type="hidden" name="catId" value="{{id}}">
+                <input type="text" class="input-block-level" placeholder="Category Name" name="catName" value="{{name}}">
+                <input type="text" class="input-block-level" placeholder="Category Desciption" name="catDesc" value="{{desc}}">
+                <button class="btn btn-large btn-primary" type="submit">Save</button>
+            </form>
         </div>
         <hr>
         <footer>

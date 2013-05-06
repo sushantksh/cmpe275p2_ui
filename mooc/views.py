@@ -2,10 +2,9 @@
 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.core.context_processors import csrf
 from django.contrib.auth import authenticate, login, logout
-#from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+
 from mooc.models import MOOC
 from time import localtime, strftime
 from cStringIO import StringIO
@@ -13,109 +12,138 @@ from cStringIO import StringIO
 import json
 import requests
 
-url = "http://localhost:8080" 
-
+#modules
 course = "course"
 category = "category"
 announcement = "announcement"
 discussion = "discussion"
+message = "message"
 quiz = "quiz"
 
-lst = "/list"
+#global variables
+headers = {'content-type': 'application/json', 'charset': 'utf-8'}
 
 latest_mooc_list = None
-selected_mooc = None
 default_mooc = None
 
-headers = {'content-type': 'application/json', 'charset': 'utf-8'}
+#dictionary to store user selected options
+#example 
+#dict = { "user1": { "url":"http://localhost:8080", "mooc":{"id":"id1", "name:"myMooc"}, "course": {"id": "id1", "name": "myCourse"}, 
+#                    "category": {"id": "id1", "name": "myCategory"}, "discussion": {"id": "id1", "name": "mydiscussion"}, 
+#                    "announcement": {"id": "id1", "name": "myAnnouncement"}, "quiz": {"id": "id1","name": "myQuiz"}
+#                  },
+#         "user2": { "url":"http://localhost:8080", "mooc":{"id":"id1", "name:"myMooc"}, "course": {"id": "id1", "name": "myCourse"}, 
+#                    "category": {"id": "id1", "name": "myCategory"}, "discussion": {"id": "id1", "name": "mydiscussion"}, 
+#                    "announcement": {"id": "id1", "name": "myAnnouncement"}, "quiz": {"id": "id1","name": "myQuiz"}
+#                  }
+#       }
+    
+#to access:
+#    data = dict["user1"]
+#    print data["category"]["id"]
+#    OR
+#    print dict["user1"]["category"]["id"]
+user_dict = {}
 
 # store mooc
 def store_mooc():
-   global latest_mooc_list, url, selected_mooc
+    global latest_mooc_list, default_mooc, headers, user_dict
    
-   latest_mooc_list = MOOC.objects.all()
-   for mooc in latest_mooc_list :
-      if mooc.is_default :
-         print 'store_mooc Primary URL ===>', mooc.group
-         selected_mooc = mooc
-         break    
-   print 'store_mooc Primary URL ===>', selected_mooc.group
+    latest_mooc_list = MOOC.objects.all()
+    for mooc in latest_mooc_list :
+        if mooc.is_default :
+            print 'mooc Primary URL ===>', mooc.group
+            default_mooc = mooc
+            break    
+    print 'default_mooc Primary URL ===>', default_mooc.group
 
 # index function
 def index(request):
-   store_mooc()
-   return render_to_response("login.html")
+    store_mooc()
+    return render_to_response("login.html")
 
 # Sign-Up function
 def signup(request):
-   return render_to_response("signup.html")
+    return render_to_response("signup.html")
 
 # add user
 def add_user(request):
-   global url, headers
+    global latest_mooc_list, default_mooc, headers, user_dict
    
-   ctx = {}
-   email = request.POST.get('email')
-   password = request.POST.get('password')
-   firstname = request.POST.get('firstname')
-   lastname = request.POST.get('lastname')
+    email = request.POST.get('email')
+    password = request.POST.get('password')
+    firstname = request.POST.get('firstname')
+    lastname = request.POST.get('lastname')
 
-   try: 
-      local_user = User.objects.create_user(email, email, password)
-      local_user.first_name = firstname
-      local_user.last_name = lastname
-      local_user.save()
-   except: 
-      ctx = {"message" : "User ID Exists. Please Try Again"}
-      return render_to_response("signup.html", ctx)
+    try: 
+        local_user = User.objects.create_user(email, email, password)
+        local_user.first_name = firstname
+        local_user.last_name = lastname
+        local_user.save()
+    except: 
+        ctx = {"message" : "User ID Exists. Please Try Again"}
+        return render_to_response("signup.html", ctx)
      
-   payload = {"_id":email, "own":[], "enrolled":[], "quizzes":[]} 
-   response = requests.post(url + "user", data=json.dumps(payload), headers=headers)
-   if response.status_code == 200 or response.status_code == 201:
-      ctx = {"message" : "User successfully registered, please login to continue."}
-      return render_to_response("login.html",ctx,context_instance=RequestContext(request))
-   else :
-      ctx = {"message" : "Sign Up Failed. Please Try Again"}
-      return render_to_response("signup.html", ctx)
+    payload = {"_id":email, "own":[], "enrolled":[], "quizzes":[]} 
+    url = default_mooc.primary_URL + "user"
+    response = requests.post(url, data=json.dumps(payload), headers=headers)
+    if response.status_code != 200 and response.status_code != 201:
+        ctx = {"message" : "Sign Up Failed. Please Try Again"}
+        return render_to_response("signup.html", ctx)
+        
+    ctx = {"message" : "User successfully registered, please login to continue."}
+    return render_to_response("login.html",ctx)
+
+
+def get_context(request):
+    global latest_mooc_list, default_mooc, headers, user_dict
+    
+    return {"fName": request.user.first_name, "lName": request.user.last_name, "latest_mooc_list": latest_mooc_list, "selectedMooc": user_dict[request.user.username]["mooc"]["name"]}
 
 # User login related stuff
 def login_user(request):
-   global latest_mooc_list, selected_mooc
+    global latest_mooc_list, default_mooc, headers, user_dict
    
-   store_mooc()
-   email = request.POST['email']
-   password = request.POST['password']
+    store_mooc()
+    email = request.POST['email']
+    password = request.POST['password']
    
-   user = authenticate(username=email, password=password)
-   if user is not None:
-      if user.is_active:
-         login(request, user)
-         ctx = {"fName": user.first_name, "lName": user.last_name, "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group }
-         return render_to_response("home.html",ctx)
-      else:
-         # Return a 'disabled account' error message
-         ctx = {"message" :"Login Failed. Please try Again"}
-         return render_to_response("login.html",ctx)
-   else:
-         ctx = {"message" :"Login Failed. Please try Again"}
-         return render_to_response("login.html",ctx)
-      
+    user = authenticate(username=email, password=password)
+    if user is not None:
+        if user.is_active:
+            login(request, user)
+#            user logged in successfully, now we need to start tracking his selections
+#            delect any previous selections of this user if present
+            del user_dict[user.username]; # remove entry with key 'Name'
+#            create empty entry in dictionary so that we can add user selections later
+            user_dict[user.username] = {"url": default_mooc.primary_URL, "mooc":{"id":default_mooc.id, "name":default_mooc.group}}
+            ctx = get_context(request)
+            return render_to_response("home.html",ctx)
+        else: 
+            # Return a 'disabled account' error message
+            ctx = {"message" :"Login disabled. Please Contact Administrator"}
+            return render_to_response("login.html",ctx)
+    else:
+        ctx = {"message" :"Login Failed. Please try Again"}
+        return render_to_response("login.html",ctx)
+# home page
 def home(request):
-   global latest_mooc_list, selected_mooc, url
+    global latest_mooc_list, default_mooc, headers, user_dict
    
-   mooc_id = request.GET.get('id')
-   if mooc_id is not None :
-      selected_mooc = MOOC.objects.get(pk=mooc_id)
-      url = selected_mooc.primary_URL
-   print 'Home Primary URL ===>', url
-   ctx = {"fName": request.user.first_name, "lName": request.user.last_name, "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group }
-   return render_to_response('home.html',ctx)
-      
+    mooc_id = request.GET.get('id')
+    if mooc_id is not None :
+        selected_mooc = MOOC.objects.get(pk=mooc_id)
+        user_dict[request.user.username]["url"] = selected_mooc.primary_URL
+        user_dict[request.user.username]["mooc"] = {"id":selected_mooc.id, "name":selected_mooc.group}
+
+    print 'Users Primary URL ===>', user_dict[request.user.username]["url"]
+    ctx = get_context(request)
+    return render_to_response('home.html',ctx)
+
+# user profile - We should show list of course user owns as well as enrolled here. It should be complete userprofile page
 def profile(request):
-   global latest_mooc_list, selected_mooc
-   
-   ctx = {"fName" :request.user.first_name, "lName": request.user.last_name, "email":request.user.username, "latest_mooc_list": latest_mooc_list, "selectedMooc": selected_mooc.group}
-   return render_to_response("profile.html",ctx)
+    ctx = get_context(request)
+    return render_to_response("profile.html",ctx)
 
 def update_user(request):
    global latest_mooc_list, selected_mooc
@@ -137,8 +165,9 @@ def update_user(request):
      
 # log out function
 def logout_user(request):
-   logout(request)
-   return render_to_response('login.html')   
+    del dict[request.user.username]; # remove entry with key 'Name'
+    logout(request)
+    return render_to_response('login.html')   
 
 # category
 def list_category(request, msg=''):
