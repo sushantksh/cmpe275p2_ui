@@ -1,7 +1,7 @@
 # Create your views here.
 
 from django.shortcuts import render_to_response
-from django.template import RequestContext
+#from django.template import RequestContext
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 
@@ -37,7 +37,6 @@ default_mooc = None
 #                    "announcement": {"id": "id1", "name": "myAnnouncement"}, "quiz": {"id": "id1","name": "myQuiz"}
 #                  }
 #       }
-    
 #to access:
 #    data = dict["user1"]
 #    print data["category"]["id"]
@@ -85,7 +84,7 @@ def add_user(request):
         return render_to_response("signup.html", ctx)
      
     payload = {"_id":email, "own":[], "enrolled":[], "quizzes":[]} 
-    url = default_mooc.primary_URL + "user"
+    url = default_mooc.primary_URL + "/user"
     response = requests.post(url, data=json.dumps(payload), headers=headers)
     if response.status_code != 200 and response.status_code != 201:
         ctx = {"message" : "Sign Up Failed. Please Try Again"}
@@ -285,11 +284,31 @@ def remove_category(request):
 
     return list_category(request, "Failed to remove category!!")    
     
-# fetch course list for selected category and show them   
-def list_course(request):
+# build list of courses owned and enrolled for this mooc by logged in user
+# this is required so that we can allow only owner to edit/delete course and drop if already enrolled    
+def fetch_user(request, ctx):
     global latest_mooc_list, default_mooc, headers, user_dict
     
-    ctx = get_context(request)
+    file_str = StringIO()
+    file_str.write(default_mooc.primary_URL)
+    file_str.write('/user/')
+    file_str.write(request.user.username)
+    
+    tempUrl = file_str.getvalue()
+    print 'fetch_user.URL ===>', tempUrl
+    response = requests.get(tempUrl)
+    if response.status_code == 200:
+        data = response.json()
+        print 'fetch_user:data ===>', data
+        
+        ctx["courses_own"] = data["own"]
+        ctx["courses_enrolled"] = data["enrolled"]
+    
+# fetch course list for selected category and show them   
+def list_course(request, msg=''):
+    global latest_mooc_list, default_mooc, headers, user_dict
+    
+    ctx = get_context(request, msg)
     ctx["course_list"] = []
     
     file_str = StringIO()
@@ -311,7 +330,9 @@ def list_course(request):
         data = response.json()
         print 'category_course:data ===>', data
         ctx["course_list"] = data["list"]
-            
+        
+#    build list of courses enrolled and owned for this mooc
+    fetch_user(request, ctx)
     return render_to_response("courses.html",ctx)
 
 # show course add / edit page
@@ -365,39 +386,246 @@ def course(request):
 # @login_required(login_url='login') -- > Good to have, need to figure out usage.
 def add_course(request):
     global latest_mooc_list, default_mooc, headers, user_dict
-#    TODO - Add handling to save Course in backend as well as update user object with course information
-    payload = {"_id":"course1","category":"annonymous_1","title":"introduction to algebra","section":2,"dept":"eng","term":"Spring","year":2013,"instructor":[{"name":"russel Doe","id":29}],"days":["Monday","Wednesday","Friday"],"hours":["8:00AM","9:15:AM"],"Description":"My course","attachment":"PATH","version":"1"}
-    response = requests.post(user_dict[request.user.username]["url"] + course, data=json.dumps(payload), headers=headers)
-    print response.text
+    data = {} 
+    
+    course_id = request.POST.get('courseId')
+    if course_id != -1 :
+        data["_id"] = course_id
+    data["category"] = request.POST.get("category")
+    data["title"] = request.POST.get("title")
+    data["dept"] = request.POST.get("dept")
+    data["section"] = request.POST.get("section")
+    data["term"] = request.POST.get("term")
+    data["instructor"] = request.user.username
+    data["days"] = request.POST.get("days")
+    data["description"] = request.POST.get("description")
+    data["attachment"] = request.POST.get("attachment")
+    data["hours"] = ["8:00AM","9:15:AM"]
+    data["version"] = "1"
+
+    print 'add_course:data ===>', data
+    
+    file_str = StringIO()
+    file_str.write(user_dict[request.user.username]["url"])
+    file_str.write('/course')
+    
+    tempUrl = file_str.getvalue()
+    print 'add_course.URL ===>', tempUrl
+    response = requests.post(tempUrl, json.dumps(data), headers=headers)
+    if response.status_code == 200 or response.status_code == 201:
+        data = response.json()
+        print 'add_course:data ===>', data
+        if course_id == -1 :
+            # Now we need to add course to user object
+            file_str = StringIO()
+            file_str.write(default_mooc.primary_URL)
+            file_str.write('/user/')
+            file_str.write(request.user.username)
+    
+            tempUrl = file_str.getvalue()
+            print 'add_course.fetch_user.URL ===>', tempUrl
+            user_response = requests.get(tempUrl)
+            if user_response.status_code == 200:
+                user_data = user_response.json()
+                print 'add_course.fetch_user:data ===>', user_data
+            
+                own_course = user_dict[request.user.username]["mooc"]["name"] + ":" + data["id"]
+                user_data["own"].append(own_course)
+    
+                tempUrl = default_mooc.primary_URL + "/user"
+                user_update_response = requests.post(tempUrl, data=json.dumps(user_data), headers=headers)
+                if user_update_response.status_code == 200:
+                    user_update_data = user_update_response.json()
+                    print 'add_course.update_user:data ===>', user_update_data
+                    # TODO - what to do if add to user fails
+                return list_course(request, "Course added!!!")
+        else:
+            return list_course(request, "Course edited!!!")
+    
+    ctx = get_context(request, "Failed to add Course")
+    ctx["id"] = data["id"]
+    ctx["instructor"] = request.user.username
+    ctx["title"] = data["title"]
+    ctx["category"] = data["category"]
+    ctx["dept"] = data["dept"]
+    ctx["section"] = data["section"]
+    ctx["term"] = data["term"]
+    ctx["days"] = data["days"]
+    ctx["description"] = data["description"]
+    ctx["attachment"] = data["attachment"]    
+    
+    return render_to_response("course_add.html",ctx)    
 
 def remove_course(request):
     global latest_mooc_list, default_mooc, headers, user_dict
-    response = requests.get(user_dict[request.user.username]["url"] + course +"/course1")
-    print response.text
+   
+    name = request.GET.get('id')
+    if name is not -1 :
+        file_str = StringIO()
+        file_str.write(user_dict[request.user.username]["url"])
+        file_str.write('/course/')
+        file_str.write(name)        
+        
+        tempUrl = file_str.getvalue()
+        print 'remove_course.URL ===>', tempUrl
+        response = requests.delete(tempUrl)
+        if response.status_code == 200:
+            data = response.json()
+            print 'remove_course:data ===>', data            
+            # Now we need to remove course from user object
+            file_str = StringIO()
+            file_str.write(default_mooc.primary_URL)
+            file_str.write('/user/')
+            file_str.write(request.user.username)
+    
+            tempUrl = file_str.getvalue()
+            print 'remove_course.fetch_user.URL ===>', tempUrl
+            user_response = requests.get(tempUrl)
+            if user_response.status_code == 200:
+                user_data = user_response.json()
+                print 'remove_course.fetch_user:data ===>', user_data
+            
+                own_course = user_dict[request.user.username]["mooc"]["name"] + ":" + name
+                try:
+                    user_data["own"].remove(own_course)
+                    tempUrl = default_mooc.primary_URL + "/user"
+                    user_update_response = requests.post(tempUrl, data=json.dumps(user_data), headers=headers)
+                    if user_update_response.status_code == 200:
+                        user_update_data = user_update_response.json()
+                        print 'remove_course.update_user:data ===>', user_update_data                    
+                except:
+                    print 'remove_course.remove_from_user ===> failed'
+
+            return list_course(request, "Course removed!!!")
+    return list_course(request, "Failed to remove course!!")  
+
+def get_course(request):
+    name = request.GET.get('id')
+    if name is not None:
+        return view_course(request, name)
+    return 
+
+def view_course(request, course_id):
+    global latest_mooc_list, default_mooc, headers, user_dict
+    
+    ctx = get_context(request)
+    #    build list of courses enrolled and owned for this mooc
+    fetch_user(request, ctx)
+    
+    ctx["instructor"] = request.user.username
+
+    file_str = StringIO()
+    file_str.write(user_dict[request.user.username]["url"])
+    file_str.write('/course/')
+    file_str.write(course_id)
+    
+    tempUrl = file_str.getvalue()
+    print 'get_course.URL ===>', tempUrl
+    response = requests.get(tempUrl)
+    if response.status_code == 200:
+        data = response.json()
+        print 'get_course:data ===>', data
+        ctx["id"] = data["id"]
+        ctx["title"] = data["title"]
+        ctx["category"] = data["category"]
+        ctx["section"] = data["section"]
+        ctx["dept"] = data["dept"]
+        ctx["term"] = data["term"]
+        ctx["days"] = data["days"]
+        ctx["description"] = data["description"]
+        ctx["attachment"] = data["attachment"]
+        ctx["enrolled"] = False
+        
+        courses_enrolled = ctx["courses_enrolled"]
+        if(courses_enrolled):
+            enroll_course = user_dict[request.user.username]["mooc"]["name"] + ":" + ctx["id"]
+            for course_name in courses_enrolled:
+                if( course_name == enroll_course ):
+                    ctx["enrolled"] = True
+                    break
+    
+        file_str = StringIO()
+        file_str.write(user_dict[request.user.username]["url"])
+        file_str.write('/category/')
+        file_str.write(ctx["category"])
+        
+        tempUrl = file_str.getvalue()
+        print 'get_course.get_category.URL ===>', tempUrl
+        response = requests.get(tempUrl)
+        if response.status_code == 200:
+            data = response.json()
+            print 'get_course.get_category:data ===>', data
+            ctx["category"] = data["name"]    
+    
+    return render_to_response("course_view.html",ctx)   
 
 # enroll user
-def enroll_user(request):
+def enroll_course(request):
     global latest_mooc_list, default_mooc, headers, user_dict
-    course_id = request.GET.get('id')
-    user_id = request.user.username
-    print course_id, user_id
-    payload = {"email" : user_id , "courseid" : course_id}
-    requests.put(user_dict[request.user.username]["url"]+ course + "/enroll", data=json.dumps(payload), headers=headers)
-    ctx = {"fName": request.user.first_name, "lName": request.user.last_name }
-    return render_to_response("home.html",ctx,context_instance=RequestContext(request))      
+    
+    name = request.GET.get('id')
+    if name is not None:
+        # Now we need to enroll course for user object
+        file_str = StringIO()
+        file_str.write(default_mooc.primary_URL)
+        file_str.write('/user/')
+        file_str.write(request.user.username)
+    
+        tempUrl = file_str.getvalue()
+        print 'enroll_user.fetch_user.URL ===>', tempUrl
+        response = requests.get(tempUrl)
+        if response.status_code == 200:
+            data = response.json()
+            print 'enroll_user.fetch_user:data ===>', data
+        
+            enroll_course = user_dict[request.user.username]["mooc"]["name"] + ":" + name
+            try:
+                data["enrolled"].append(enroll_course)
+                tempUrl = default_mooc.primary_URL + "/user"
+                user_update_response = requests.post(tempUrl, data=json.dumps(data), headers=headers)
+                if user_update_response.status_code == 200:
+                    user_update_data = user_update_response.json()
+                    print 'enroll_user.update_user:data ===>', user_update_data                    
+            except:
+                print 'enroll_user.append_to_user ===> failed'    
+    else:
+        print 'enroll_user ===> failed'  
+        return list_course(request, "Course not found!!!")
+    return view_course(request, name)
 
-   
-def get_course(request):
+# enroll user
+def drop_course(request):
     global latest_mooc_list, default_mooc, headers, user_dict
-   
-    response = requests.get(user_dict[request.user.username]["url"] + course +"/course1")
-    print response.json()
-   
-def update_course(request):
-    global latest_mooc_list, default_mooc, headers, user_dict
-    payload = {"_id":"course1","category":"annonymous_1","title":"machine learning","section":2,"dept":"eng","term":"Spring","year":2013,"instructor":[{"name":"russel Doe","id":29}],"days":["Monday","Wednesday","Friday"],"hours":["8:00AM","9:15:AM"],"Description":"My course","attachment":"PATH","version":"1"}
-    response = requests.put(user_dict[request.user.username]["url"] + course, data=json.dumps(payload), headers=headers)
-    print response.text
+    
+    name = request.GET.get('id')
+    if name is not None:
+        # Now we need to enroll course for user object
+        file_str = StringIO()
+        file_str.write(default_mooc.primary_URL)
+        file_str.write('/user/')
+        file_str.write(request.user.username)
+    
+        tempUrl = file_str.getvalue()
+        print 'drop_course.fetch_user.URL ===>', tempUrl
+        response = requests.get(tempUrl)
+        if response.status_code == 200:
+            data = response.json()
+            print 'drop_course.fetch_user:data ===>', data
+        
+            enroll_course = user_dict[request.user.username]["mooc"]["name"] + ":" + name
+            try:
+                data["enrolled"].remove(enroll_course)
+                tempUrl = default_mooc.primary_URL + "/user"
+                user_update_response = requests.post(tempUrl, data=json.dumps(data), headers=headers)
+                if user_update_response.status_code == 200:
+                    user_update_data = user_update_response.json()
+                    print 'drop_course.update_user:data ===>', user_update_data                    
+            except:
+                print 'drop_course.remove_from_user ===> failed'    
+    else:
+        print 'drop_course ===> failed'    
+        return list_course(request, "Course not found!!!")
+    return view_course(request, name)    
 
 #
 # announcement

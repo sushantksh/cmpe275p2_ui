@@ -99,17 +99,6 @@
                 <span class="label label-important">{{message}}</span>
             {% endif %}
         </div>
-            data = response.json()
-            print 'course:data ===>', data
-            ctx["id"] = data["id"]
-            ctx["title"] = data["title"]
-            ctx["category"] = data["category"]
-            ctx["section"] = data["section"]
-            ctx["dept"] = data["dept"]
-            ctx["instructor"] = request.user.username
-            ctx["days"] = data["days"]
-            ctx["description"] = data["description"]
-            ctx["attachment"] = data["attachment"]
         <div class=row>
 	      <form name="CourseForm" class="form-signin" action="/mooc/add_course/" method="POST">
                 <h2 class="form-signin-heading">Course</h2>

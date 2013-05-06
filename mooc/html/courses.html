@@ -97,8 +97,17 @@
                     <tr>
              		<td>{{forloop.counter}}</td>
                 		<td><a href="/mooc/get_course/?id={{course.id}}">{{course.name}}</a></td>
-                		<td><a href="/mooc/course/?id={{course.id}}"><button class="btn btn-mini" type="button"><i class="icon-pencil"></i> Edit</button></a>
-                    		&nbsp;&nbsp;<a href="/mooc/remove_course/?id={{course.id}}"><button class="btn btn-mini" type="button"><i class="icon-remove-sign"></i></button></a>
+                		<td>
+                            {% if courses_own %}
+                                {% own_course = selectedMooc + ":" + course.id %}
+                                {% for course_name in courses_own %}
+                                    {% if course_name == own_course %}
+                                        <a href="/mooc/course/?id={{course.id}}"><button class="btn btn-mini" type="button"><i class="icon-pencil"></i> Edit</button></a>
+                                		&nbsp;&nbsp;<a href="/mooc/remove_course/?id={{course.id}}"><button class="btn btn-mini" type="button"><i class="icon-remove-sign"></i></button></a>
+                                        {% break %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
                 		</td>
                 	   </tr>
         	   {% endfor %}      

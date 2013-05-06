@@ -29,25 +29,24 @@ urlpatterns = patterns('',
     url(r'^get_course/$', views.get_course),
 
 #   course and user related activity    
-    url(r'^enroll/$', views.enroll_user),
+    url(r'^enroll_course/$', views.enroll_course),
+    url(r'^drop_course/$', views.drop_course),
 
-    
-
-
-
-
+#    announcement related activity
     url(r'^add_announcement/$', views.add_announcement),
     url(r'^get_announcement/$', views.get_announcement),
     url(r'^list_announcement/$', views.list_announcement),
     url(r'^update_announcement/$', views.update_announcement),
     url(r'^remove_announcement/$', views.remove_announcement),
     
+#    discussion related activity
     url(r'^add_discussion/$', views.add_discussion),
     url(r'^get_discussion/$', views.get_discussion),
     url(r'^list_discussion/$', views.list_discussion),
     url(r'^update_discussion/$', views.update_discussion),
     url(r'^remove_discussion/$', views.remove_discussion),
 
+#    quiz related activity
     url(r'^add_quiz/$', views.add_quiz),
     url(r'^get_quiz/$', views.get_quiz),
     url(r'^list_quiz/$', views.list_quiz),
