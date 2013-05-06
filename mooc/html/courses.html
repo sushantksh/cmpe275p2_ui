@@ -46,7 +46,7 @@
                     <ul class="nav">
                         <li><a href="/mooc/home/">Home</a></li>
                         <li><a href="/mooc/list_category/">Categories</a></li>
-                        {% if category %}
+                        {% if category_name %}
                             <li class="active"><a href="/mooc/list_course/">Courses</a></li>                            
                         {% else %}
                             <li class="active"><a href="#">Courses</a></li>
@@ -76,7 +76,7 @@
         <div class="row">
             <a href="/mooc/course/"><button class="btn" type="button"><b class="icon-plus-sign"></b>Add Course</button></a>
             {% if category %}
-                <h5>Category: {{category}}</h5>
+                <h5>Category: {{category_name}}</h5>
             {% endif %}
 
             {% if message %}

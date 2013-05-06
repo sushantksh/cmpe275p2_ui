@@ -14,6 +14,32 @@
         padding-top: 60px;
         padding-bottom: 40px;
       }
+
+      .form-signin {
+        max-width: 300px;
+        padding: 19px 29px 29px;
+        margin: 0 auto 20px;
+        background-color: #fff;
+        border: 1px solid #e5e5e5;
+        -webkit-border-radius: 5px;
+           -moz-border-radius: 5px;
+                border-radius: 5px;
+        -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+           -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+                box-shadow: 0 1px 2px rgba(0,0,0,.05);
+      }
+      .form-signin .form-signin-heading,
+      .form-signin .checkbox {
+        margin-bottom: 10px;
+      }
+      .form-signin input[type="text"],
+      .form-signin input[type="password"] {
+        font-size: 16px;
+        height: auto;
+        margin-bottom: 15px;
+        padding: 7px 9px;
+      }
+
     </style>
     <link href="/assets/css/bootstrap-responsive.css" rel="stylesheet">
 
@@ -29,7 +55,6 @@
     <link rel="apple-touch-icon-precomposed" href="/assets/ico/apple-touch-icon-57-precomposed.png">
     <link rel="shortcut icon" href="/assets/ico/favicon.png">
 </head>
-
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
@@ -45,8 +70,8 @@
                 <div class="nav-collapse collapse">
                     <ul class="nav">
                         <li><a href="/mooc/home/">Home</a></li>
-                        <li class="active"><a href="#">Categories</a></li>
-                        <li><a href="/mooc/list_course/">Courses</a></li>
+                        <li><a href="/mooc/list_category/">Categories</a></li>
+                        <li class="active"><a href="/mooc/list_course/">Courses</a></li>                            
                         <li class="dropdown">
                             {% if latest_mooc_list %}
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">MOOCS<b class="caret"></b></a>
@@ -70,32 +95,55 @@
 
     <div class="container">
         <div class="row">
-            <a href="/mooc/category/"><button class="btn" type="button"><b class="icon-plus-sign"></b>Add Category</button></a>
             {% if message %}
                 <span class="label label-important">{{message}}</span>
             {% endif %}
         </div>
+            data = response.json()
+            print 'course:data ===>', data
+            ctx["id"] = data["id"]
+            ctx["title"] = data["title"]
+            ctx["category"] = data["category"]
+            ctx["section"] = data["section"]
+            ctx["dept"] = data["dept"]
+            ctx["instructor"] = request.user.username
+            ctx["days"] = data["days"]
+            ctx["description"] = data["description"]
+            ctx["attachment"] = data["attachment"]
         <div class=row>
-            <table class="table table-bordered table-striped table-hover">
-                <thead>
-                    <tr>
-                      	<th style="width: 2%;">No.</th>
-                      	<th style="width: 80%;">Category</th>
-                      	<th style="width: 18%;">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for category in category_list %}
-                    <tr>
-             		<td>{{forloop.counter}}</td>
-                		<td><a href="/mooc/list_course/?id={{category.id}}">{{category.name}}</a></td>
-                		<td><a href="/mooc/category/?id={{category.id}}&name={{category.name}}"><button class="btn btn-mini" type="button"><i class="icon-pencil"></i> Edit</button></a>
-                    		&nbsp;&nbsp;<a href="/mooc/remove_category/?id={{category.id}}"><button class="btn btn-mini" type="button"><i class="icon-remove-sign"></i></button></a>
-                		</td>
-                	   </tr>
-        	   {% endfor %}      
-                </tbody>
-        	 </table>
+	      <form name="CourseForm" class="form-signin" action="/mooc/add_course/" method="POST">
+                <h2 class="form-signin-heading">Course</h2>
+                <input type="hidden" name="courseId" value="{{id}}">
+		    <label class="control-label" for="textarea">Course Title</label>  
+                <input type="text" class="input-block-level" placeholder="Course Title" name="title" value="{{title}}">
+		    <label class="control-label" for="textarea">Course Category</label>  
+                {% if category_list %}
+                    <select name="category">
+                        {% for catItem in category_list %}
+                            {% if catItem.id == category %}
+                                <option value="{{catItem.id}}" selected>{{catItem.name}}</option>
+                            {% else %}
+                                <option value="{{catItem.id}}">{{catItem.name}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                {% endif %}
+		    <label class="control-label" for="textarea">Section</label>  
+                <input type="text" class="input-block-level" placeholder="Section" name="section" value="{{section}}">
+		    <label class="control-label" for="textarea">Dept</label>  
+                <input type="text" class="input-block-level" placeholder="Course Dept" name="dept" value="{{dept}}">
+		    <label class="control-label" for="textarea">Term</label>  
+                <input type="text" class="input-block-level" placeholder="Course Term" name="term" value="{{term}}">
+		    <label class="control-label" for="textarea">Instructor</label>
+                <label class="control-label" for="textarea">{{instructor}}</label>  
+		    <label class="control-label" for="textarea">Day</label>  
+                <input type="text" class="input-block-level" placeholder="Course Days" name="days" value="{{days}}">
+		    <label class="control-label" for="textarea">Description</label>  
+                <input type="text" class="input-block-level" placeholder="Course Description" name="description" value="{{description}}">
+		    <label class="control-label" for="textarea">Attachment</label>  
+        	    <input type="text" class="input-block-level" placeholder="Course Attachment" name="attachment" value="{{attachment}}">
+                <button class="btn btn-large btn-primary" type="submit">Save</button>
+            </form>
         </div>
         <hr>
         <footer>
@@ -119,5 +167,6 @@
     <script src="/assets/js/bootstrap-collapse.js"></script>
     <script src="/assets/js/bootstrap-carousel.js"></script>
     <script src="/assets/js/bootstrap-typeahead.js"></script>
-</body>
+
+  </body>
 </html>

@@ -9,24 +9,26 @@ urlpatterns = patterns('',
     url(r'^add_user/$', views.add_user), # Handles User Sign Up Form.
     url(r'^login/$', views.login_user, name='signin'),
     url(r'^home/$', views.home),
+
 #    user related views
     url(r'^profile/$', views.profile),
     url(r'^update_user/$', views.update_user),
     url(r'^logout/$', views.logout_user),
+
 #    category related views
     url(r'^list_category/$', views.list_category),
     url(r'^category/$', views.category),
     url(r'^add_category/$', views.add_category),
     url(r'^remove_category/$', views.remove_category),
-#    course related views
-    url(r'^category/courses/$', views.category_course),
 
-    url(r'^add_course/$', views.add_course),
-    url(r'^get_course/$', views.get_course),
+#    course related views
     url(r'^list_course/$', views.list_course),
-    url(r'^update_course/$', views.update_course),
+    url(r'^course/$', views.course),
+    url(r'^add_course/$', views.add_course),
     url(r'^remove_course/$', views.remove_course),
-    
+    url(r'^get_course/$', views.get_course),
+
+#   course and user related activity    
     url(r'^enroll/$', views.enroll_user),
 
     
